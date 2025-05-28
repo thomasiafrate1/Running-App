@@ -1,7 +1,7 @@
 // app/index.tsx
 import { Text, View, Button, FlatList } from "react-native";
 import { useEffect, useState } from "react";
-import { getToken, removeToken } from "../utils/token";
+import { getToken, removeToken } from "../../utils/token";
 import { useRouter } from "expo-router";
 
 export default function Dashboard() {
@@ -56,7 +56,7 @@ export default function Dashboard() {
     <View style={{ padding: 20 }}>
       <Text>Bienvenue {userEmail}</Text>
 
-      <Button title="Commencer une course" onPress={() => router.push("/course/run")} />
+      <Button title="Commencer une course" onPress={() => router.push("/run")} />
       <Button title="Déconnexion" onPress={handleLogout} />
 
       <Text style={{ marginTop: 20 }}>Courses passées :</Text>
