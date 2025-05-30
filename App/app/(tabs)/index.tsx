@@ -1,74 +1,124 @@
-// app/index.tsx
-import { Text, View, Button, FlatList } from "react-native";
 import { useEffect, useState } from "react";
-import { getToken, removeToken } from "../../utils/token";
-import { useRouter } from "expo-router";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
+import MapView, { Polyline } from "react-native-maps";
+import { getToken } from "../../utils/token";
 
-export default function Dashboard() {
-  const [userEmail, setUserEmail] = useState("");
-  const [courses, setCourses] = useState<Course[]>([]);
-  const router = useRouter();
-
-  type Course = {
+type Course = {
   id: number;
   distance: number;
   duration: number;
   start_time: string;
+  path?: string;
 };
 
+type Stats = {
+  totalCourses: number;
+  totalDistance: number;
+  totalDuration: number;
+  distance : number;
+};
+
+export default function HomeScreen() {
+  const [lastCourse, setLastCourse] = useState<Course | null>(null);
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
+  
+
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchData = async () => {
       const token = await getToken();
 
-      const res = await fetch("http://192.168.1.42:3000/api/auth/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      try {
+        const resStats = await fetch(`http://192.168.1.42:3000/api/courses/stats`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const resCourses = await fetch(`http://192.168.1.42:3000/api/courses`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      const data = await res.json();
-      setUserEmail(data.user?.email || "Inconnu");
+        const statsData = await resStats.json();
+        const courses = await resCourses.json();
+
+        setStats(statsData);
+        if (courses.length > 0) {
+          setLastCourse(courses[0]);
+          if (courses[0].path) {
+            setPath(JSON.parse(courses[0].path));
+          }
+        }
+      } catch (err) {
+        console.error("Erreur de chargement :", err);
+      }
     };
 
-    const fetchCourses = async () => {
-      const token = await getToken();
-
-      const res = await fetch("http://192.168.1.42:3000/api/courses", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-      setCourses(data);
-    };
-
-    fetchUser();
-    fetchCourses();
+    fetchData();
   }, []);
 
-  const handleLogout = async () => {
-    await removeToken();
-    router.replace("/login");
-  };
-
   return (
-    <View style={{ padding: 20 }}>
-      <Text>Bienvenue {userEmail}</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>🏠 Tableau de bord</Text>
 
-      <Button title="Commencer une course" onPress={() => router.push("/run")} />
-      <Button title="Déconnexion" onPress={handleLogout} />
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>📊 Mes statistiques</Text>
+        {stats ? (
+          <>
+            <Text>🏃 Courses : {stats.totalCourses}</Text>
+            <Text>
+  📍{" "}
+  {typeof stats.totalDistance === "number"
+    ? `${stats.totalDistance.toFixed(2)} km`
+    : "Distance inconnue"}{" "}
+  
+</Text>
 
-      <Text style={{ marginTop: 20 }}>Courses passées :</Text>
-      <FlatList
-        data={courses}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <Text>
-            - {item.distance} km en {item.duration} s, le {item.start_time}
-          </Text>
+            <Text>⏱ Durée total : {Math.round(stats.totalDuration / 60)} min</Text>
+          </>
+        ) : (
+          <Text>Chargement...</Text>
         )}
-      />
-    </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>🏁 Dernière course</Text>
+        {lastCourse ? (
+          <>
+            <Text>📅 {new Date(lastCourse.start_time).toLocaleString()}</Text>
+            <Text>📍 {lastCourse.distance.toFixed(2)} km en {lastCourse.duration}s</Text>
+
+            {path.length > 1 ? (
+              <MapView
+                style={styles.map}
+                initialRegion={{
+                  latitude: path[0].latitude,
+                  longitude: path[0].longitude,
+                  latitudeDelta: 0.002,
+                  longitudeDelta: 0.002,
+                }}
+                scrollEnabled={false}
+                zoomEnabled={false}
+              >
+                <Polyline coordinates={path} strokeColor="blue" strokeWidth={3} />
+              </MapView>
+            ) : (
+              <Text style={{ color: "gray" }}>Aucun tracé disponible</Text>
+            )}
+          </>
+        ) : (
+          <Text>Pas encore de course enregistrée</Text>
+        )}
+      </View>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+  title: { fontSize: 26, fontWeight: "bold", marginBottom: 20 },
+  section: { marginBottom: 25 },
+  sectionTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
+  map: {
+    height: 150,
+    marginTop: 10,
+    borderRadius: 10,
+  },
+});

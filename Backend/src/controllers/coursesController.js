@@ -2,22 +2,23 @@ const db = require("../config/db");
 
 // POST /courses
 exports.addCourse = (req, res) => {
-  const { distance, duration, start_time, path } = req.body;
+  const { distance, duration, start_time, path, avg_speed } = req.body;
   const user_id = req.user.id;
 
   console.log("📦 Données reçues pour nouvelle course :", {
     distance,
     duration,
     start_time,
-    path
+    path,
+    
   });
 
   if (!distance || !duration || !start_time)
     return res.status(400).json({ message: "Champs requis" });
 
   db.query(
-    "INSERT INTO courses (user_id, distance, duration, start_time, path) VALUES (?, ?, ?, ?, ?)",
-    [user_id, distance, duration, start_time, JSON.stringify(path)],
+    "INSERT INTO courses (user_id, distance, duration, start_time, path, avg_speed) VALUES (?, ?, ?, ?, ?, ?)",
+    [user_id, distance, duration, start_time, JSON.stringify(path), avg_speed],
     (err, result) => {
       if (err) return res.status(500).json({ message: "Erreur serveur", err });
       res.status(201).json({ message: "Course ajoutée", courseId: result.insertId });
@@ -134,6 +135,25 @@ exports.getPublicCourseById = (req, res) => {
         return res.status(404).json({ message: "Course non trouvée" });
       }
 
+      res.json(results[0]);
+    }
+  );
+};
+
+// GET /courses/stats
+exports.getUserStats = (req, res) => {
+  const user_id = req.user.id;
+
+  db.query(
+    `SELECT 
+      COUNT(*) AS totalCourses, 
+      SUM(distance) AS totalDistance, 
+      SUM(duration) AS totalDuration 
+     FROM courses 
+     WHERE user_id = ?`,
+    [user_id],
+    (err, results) => {
+      if (err) return res.status(500).json({ message: "Erreur serveur", err });
       res.json(results[0]);
     }
   );

@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const db = require("../config/db");
 
 dotenv.config();
 
@@ -13,8 +14,16 @@ function authMiddleware(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; 
-    next();
+    const userId = decoded.id;
+
+    db.query("SELECT id, email FROM users WHERE id = ?", [userId], (err, results) => {
+      if (err || results.length === 0) {
+        return res.status(401).json({ message: "Utilisateur non trouvé" });
+      }
+
+      req.user = results[0]; // ✅ contient maintenant { id, email }
+      next();
+    });
   } catch (err) {
     return res.status(403).json({ message: "Token invalide ou expiré" });
   }

@@ -83,6 +83,8 @@ export default function HistoryDetailScreen() {
         <Text>📏 Distance : {course.distance.toFixed(2)} km</Text>
         <Text>⏱ Durée : {course.duration}s</Text>
         <Text>🕒 Date : {new Date(course.start_time).toLocaleString()}</Text>
+        
+
         {course.email && <Text>📧 Utilisateur : {course.email}</Text>}
       </View>
     </ScrollView>

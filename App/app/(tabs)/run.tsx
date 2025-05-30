@@ -13,10 +13,15 @@ export default function RunScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
 const pathRef = useRef<{ latitude: number; longitude: number }[]>([]);
+const [speed, setSpeed] = useState(0);
+
 
 
 
   const router = useRouter();
+  const avgSpeed = duration > 0 ? (distance / 1000) / (duration / 3600) : 0;
+// km/h
+
 
 const timerInterval = useRef<number | null>(null);
 const locationInterval = useRef<number | null>(null);
@@ -71,11 +76,11 @@ const locationInterval = useRef<number | null>(null);
   const newPoint = {
     latitude: loc.coords.latitude,
     longitude: loc.coords.longitude,
+    timestamp: Date.now(),
   };
 
   console.log("📍 Nouvelle position GPS :", newPoint);
 
-  // Calcul de distance
   if (pathRef.current.length > 0) {
     const prevPoint = pathRef.current[pathRef.current.length - 1];
     const dist = getDistanceFromLatLon(
@@ -85,7 +90,15 @@ const locationInterval = useRef<number | null>(null);
       newPoint.longitude
     );
 
-    console.log("📏 Distance calculée :", dist.toFixed(2));
+    const timeDiff =
+      (newPoint.timestamp - (prevPoint.timestamp || newPoint.timestamp - 3000)) / 1000;
+
+    const instSpeed = (dist / 1000) / (timeDiff / 3600); // en km/h
+
+    if (!isNaN(instSpeed) && isFinite(instSpeed)) {
+      setSpeed(instSpeed);
+      console.log("🚀 Vitesse instantanée :", instSpeed.toFixed(2));
+    }
 
     if (dist < 1000) {
       setDistance((prev) => {
@@ -107,6 +120,7 @@ const locationInterval = useRef<number | null>(null);
 }, 3000);
 
 
+
   };
 
   const handleStop = async () => {
@@ -123,11 +137,14 @@ const locationInterval = useRef<number | null>(null);
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        distance: parseFloat((distance / 1000).toFixed(2)),
-        duration,
-        start_time: startTime?.toISOString(),
-        path: pathRef.current,
-      }),
+  distance: parseFloat((distance / 1000).toFixed(2)),
+  duration,
+  start_time: startTime?.toISOString(),
+  path: pathRef.current,
+  avg_speed: parseFloat(avgSpeed.toFixed(2))
+
+}),
+
     });
 
     Alert.alert("Course enregistrée !");
@@ -167,6 +184,10 @@ const locationInterval = useRef<number | null>(null);
     ? `${Math.round(distance)} m`
     : `${(distance / 1000).toFixed(2)} km`}
 </Text>
+<Text style={{ fontSize: 18, fontWeight: "bold" }}>
+  🚀 Vitesse : {speed.toFixed(2)} km/h
+</Text>
+
 
   <Button title="Arrêter la course" onPress={handleStop} />
 </View>
