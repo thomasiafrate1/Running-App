@@ -2,21 +2,29 @@ const db = require("../config/db");
 
 // POST /courses
 exports.addCourse = (req, res) => {
-  const { distance, duration, start_time } = req.body;
+  const { distance, duration, start_time, path } = req.body;
   const user_id = req.user.id;
+
+  console.log("📦 Données reçues pour nouvelle course :", {
+    distance,
+    duration,
+    start_time,
+    path
+  });
 
   if (!distance || !duration || !start_time)
     return res.status(400).json({ message: "Champs requis" });
 
   db.query(
-    "INSERT INTO courses (user_id, distance, duration, start_time) VALUES (?, ?, ?, ?)",
-    [user_id, distance, duration, start_time],
+    "INSERT INTO courses (user_id, distance, duration, start_time, path) VALUES (?, ?, ?, ?, ?)",
+    [user_id, distance, duration, start_time, JSON.stringify(path)],
     (err, result) => {
       if (err) return res.status(500).json({ message: "Erreur serveur", err });
       res.status(201).json({ message: "Course ajoutée", courseId: result.insertId });
     }
   );
 };
+
 
 // GET /courses
 exports.getUserCourses = (req, res) => {
@@ -59,6 +67,74 @@ exports.deleteCourse = (req, res) => {
     (err, result) => {
       if (err) return res.status(500).json({ message: "Erreur serveur", err });
       res.json({ message: "Course supprimée" });
+    }
+  );
+};
+
+// GET /courses/all
+exports.getAllCourses = (req, res) => {
+  db.query(
+    "SELECT * FROM courses ORDER BY start_time DESC",
+    (err, results) => {
+      if (err) return res.status(500).json({ message: "Erreur serveur", err });
+      res.json(results);
+    }
+  );
+};
+
+
+// GET /courses/user/:id
+exports.getCoursesByUserId = (req, res) => {
+  const userId = req.params.id;
+
+  db.query(
+    "SELECT * FROM courses WHERE user_id = ? ORDER BY start_time DESC",
+    [userId],
+    (err, results) => {
+      if (err) return res.status(500).json({ message: "Erreur serveur", err });
+
+      if (results.length === 0) {
+        return res.status(404).json({ message: "Aucune course trouvée pour cet utilisateur" });
+      }
+
+      res.json(results);
+    }
+  );
+};
+
+// GET /courses/recent
+exports.getRecentCourses = (req, res) => {
+  db.query(
+    `SELECT c.*, u.email 
+     FROM courses c 
+     JOIN users u ON c.user_id = u.id 
+     ORDER BY c.start_time DESC 
+     LIMIT 15`,
+    (err, results) => {
+      if (err) return res.status(500).json({ message: "Erreur serveur", err });
+      res.json(results);
+    }
+  );
+};
+
+// GET /courses/public/:id
+exports.getPublicCourseById = (req, res) => {
+  const courseId = req.params.id;
+
+  db.query(
+    `SELECT c.*, u.email 
+     FROM courses c
+     JOIN users u ON c.user_id = u.id
+     WHERE c.id = ?`,
+    [courseId],
+    (err, results) => {
+      if (err) return res.status(500).json({ message: "Erreur serveur", err });
+
+      if (results.length === 0) {
+        return res.status(404).json({ message: "Course non trouvée" });
+      }
+
+      res.json(results[0]);
     }
   );
 };

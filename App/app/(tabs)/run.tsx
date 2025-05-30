@@ -126,6 +126,7 @@ const locationInterval = useRef<number | null>(null);
         distance: parseFloat((distance / 1000).toFixed(2)),
         duration,
         start_time: startTime?.toISOString(),
+        path: pathRef.current,
       }),
     });
 
