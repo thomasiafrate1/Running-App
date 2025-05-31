@@ -24,8 +24,8 @@ export default function HistoryDetailScreen() {
     const fetchCourse = async () => {
       const token = await getToken();
       const url = isPublic
-      ? `http://192.168.1.42:3000/api/courses/public/${id}`
-      : `http://192.168.1.42:3000/api/courses/${id}`;
+      ? `http://192.168.1.64:3000/api/courses/public/${id}`
+      : `http://192.168.1.64:3000/api/courses/${id}`;
       const res = await fetch(url, {
       headers: isPublic ? {} : { Authorization: `Bearer ${token}` },
       });

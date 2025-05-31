@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback  } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import MapView, { Polyline } from "react-native-maps";
 import { getToken } from "../../utils/token";
+import { useFocusEffect } from "@react-navigation/native";
 
 type Course = {
   id: number;
@@ -24,15 +25,16 @@ export default function HomeScreen() {
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
   
 
-  useEffect(() => {
+  useFocusEffect(
+  useCallback(() => {
     const fetchData = async () => {
       const token = await getToken();
 
       try {
-        const resStats = await fetch(`http://192.168.1.42:3000/api/courses/stats`, {
+        const resStats = await fetch(`http://192.168.1.64:3000/api/courses/stats`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const resCourses = await fetch(`http://192.168.1.42:3000/api/courses`, {
+        const resCourses = await fetch(`http://192.168.1.64:3000/api/courses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -45,6 +47,8 @@ export default function HomeScreen() {
           if (courses[0].path) {
             setPath(JSON.parse(courses[0].path));
           }
+        } else {
+          setLastCourse(null); // 👈 gérer le cas aucune course
         }
       } catch (err) {
         console.error("Erreur de chargement :", err);
@@ -52,7 +56,9 @@ export default function HomeScreen() {
     };
 
     fetchData();
-  }, []);
+  }, [])
+);
+
 
   return (
     <ScrollView style={styles.container}>

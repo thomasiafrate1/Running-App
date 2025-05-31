@@ -130,7 +130,7 @@ const locationInterval = useRef<number | null>(null);
 
     const token = await getToken();
 
-    await fetch("http://192.168.1.42:3000/api/courses", {
+    await fetch("http://192.168.1.64:3000/api/courses", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

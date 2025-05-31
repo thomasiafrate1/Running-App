@@ -1,4 +1,4 @@
-const API_URL = "http://192.168.1.42:3000/api";
+const API_URL = "http://192.168.1.64:3000/api";
  // ← Mets ici l'IP locale de ton PC
 
 export const login = async (email: string, password: string) => {

@@ -148,7 +148,8 @@ exports.getUserStats = (req, res) => {
     `SELECT 
       COUNT(*) AS totalCourses, 
       SUM(distance) AS totalDistance, 
-      SUM(duration) AS totalDuration 
+      SUM(duration) AS totalDuration,
+      AVG(avg_speed) AS avgSpeed
      FROM courses 
      WHERE user_id = ?`,
     [user_id],
@@ -158,3 +159,4 @@ exports.getUserStats = (req, res) => {
     }
   );
 };
+

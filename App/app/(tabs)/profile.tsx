@@ -26,7 +26,7 @@ useEffect(() => {
       const token = await getToken();
       console.log("🔑 Token récupéré :", token);
 
-      const res = await fetch(`http://192.168.1.42:3000/api/courses/stats`, {
+      const res = await fetch(`http://192.168.1.64:3000/api/courses/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -49,7 +49,7 @@ useEffect(() => {
        const fetchUser = async () => {
         const token = await getToken();
         try {
-          const res = await fetch("http://192.168.1.42:3000/api/auth/me", {
+          const res = await fetch("http://192.168.1.64:3000/api/auth/me", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -94,7 +94,7 @@ useEffect(() => {
   {typeof stats.totalDistance === "number"
     ? `${stats.totalDistance.toFixed(2)} km`
     : "Distance inconnue"}{" "}
-  en {stats.totalDuration}s
+  
 </Text>
             <Text>⏱ Temps total : {Math.round(stats.totalDuration / 60)} min</Text>
             <Text>
