@@ -5,6 +5,15 @@ import MapView, { Polyline } from "react-native-maps";
 import { getToken } from "../../utils/token";
 import { useRouter } from "expo-router";
 
+function formatDuration(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+
+  const min = Math.floor(seconds / 60);
+  const sec = seconds % 60;
+  return `${min}min ${sec}s`;
+}
+
+
 export default function RunScreen() {
   const [running, setRunning] = useState(false);
   const [distance, setDistance] = useState(0);
@@ -14,6 +23,7 @@ export default function RunScreen() {
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
 const pathRef = useRef<{ latitude: number; longitude: number }[]>([]);
 const [speed, setSpeed] = useState(0);
+const [paused, setPaused] = useState(false);
 
 
 
@@ -47,8 +57,6 @@ const locationInterval = useRef<number | null>(null);
     console.error("Erreur GPS :", error);
     Alert.alert("Erreur", "Impossible de récupérer votre position GPS");
     }
-
-      startRun(); // ✅ startRun appelé UNE seule fois ici
     };
 
     initialize();
@@ -59,69 +67,68 @@ const locationInterval = useRef<number | null>(null);
     };
   }, []);
 
-  const startRun = () => {
-    setRunning(true);
-    setStartTime(new Date());
+  const pauseRun = () => {
+  if (timerInterval.current) clearInterval(timerInterval.current);
+  setPaused(true);
+};
 
+
+const startRun = () => {
+  if (paused) {
+    // Reprendre
+    setPaused(false);
     timerInterval.current = setInterval(() => {
       setDuration((prev) => prev + 1);
     }, 1000);
-
-    locationInterval.current = setInterval(async () => {
-  console.log("🔄 Nouvelle position demandée");
-
-  const loc = await Location.getCurrentPositionAsync({});
-  setLocation(loc);
-
-  const newPoint = {
-    latitude: loc.coords.latitude,
-    longitude: loc.coords.longitude,
-    timestamp: Date.now(),
-  };
-
-  console.log("📍 Nouvelle position GPS :", newPoint);
-
-  if (pathRef.current.length > 0) {
-    const prevPoint = pathRef.current[pathRef.current.length - 1];
-    const dist = getDistanceFromLatLon(
-      prevPoint.latitude,
-      prevPoint.longitude,
-      newPoint.latitude,
-      newPoint.longitude
-    );
-
-    const timeDiff =
-      (newPoint.timestamp - (prevPoint.timestamp || newPoint.timestamp - 3000)) / 1000;
-
-    const instSpeed = (dist / 1000) / (timeDiff / 3600); // en km/h
-
-    if (!isNaN(instSpeed) && isFinite(instSpeed)) {
-      setSpeed(instSpeed);
-      console.log("🚀 Vitesse instantanée :", instSpeed.toFixed(2));
-    }
-
-    if (dist < 1000) {
-      setDistance((prev) => {
-        const newDist = prev + dist;
-        console.log("✅ Distance actuelle (m):", newDist.toFixed(2));
-        return newDist;
-      });
-    } else {
-      console.log("⚠️ Téléportation ignorée (> 1km)");
-    }
-  } else {
-    console.log("🟢 Premier point enregistré");
+    return;
   }
 
-  // Met à jour path via ref + state pour l'affichage
-  pathRef.current.push(newPoint);
-  setPath([...pathRef.current]);
+  // Premier démarrage
+  setRunning(true);
+  setStartTime(new Date());
+  setDuration(0);
+  setDistance(0);
+  pathRef.current = [];
+  setPath([]);
 
-}, 3000);
+  timerInterval.current = setInterval(() => {
+    setDuration((prev) => prev + 1);
+  }, 1000);
 
+  locationInterval.current = setInterval(async () => {
+    const loc = await Location.getCurrentPositionAsync({});
+    setLocation(loc);
 
+    const newPoint = {
+      latitude: loc.coords.latitude,
+      longitude: loc.coords.longitude,
+      timestamp: Date.now(),
+    };
 
-  };
+    if (pathRef.current.length > 0) {
+      const prevPoint = pathRef.current[pathRef.current.length - 1];
+      const dist = getDistanceFromLatLon(
+        prevPoint.latitude,
+        prevPoint.longitude,
+        newPoint.latitude,
+        newPoint.longitude
+      );
+
+      const timeDiff = (newPoint.timestamp - (prevPoint.timestamp || newPoint.timestamp - 3000)) / 1000;
+      const instSpeed = (dist / 1000) / (timeDiff / 3600);
+
+      if (!isNaN(instSpeed) && isFinite(instSpeed)) setSpeed(instSpeed);
+
+      if (dist < 1000) {
+        setDistance((prev) => prev + dist);
+      }
+    }
+
+    pathRef.current.push(newPoint);
+    setPath([...pathRef.current]);
+  }, 3000);
+};
+
 
   const handleStop = async () => {
     setRunning(false);
@@ -160,40 +167,49 @@ const locationInterval = useRef<number | null>(null);
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <MapView
-        style={{ flex: 1 }}
-        initialRegion={{
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}
-        showsUserLocation
-      >
-        <Polyline coordinates={path} strokeColor="blue" strokeWidth={4} />
-      </MapView>
+  <View style={{ flex: 1 }}>
+    <MapView
+      style={{ flex: 1 }}
+      initialRegion={{
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      }}
+      showsUserLocation
+    >
+      <Polyline coordinates={path} strokeColor="blue" strokeWidth={4} />
+    </MapView>
 
-      <View style={styles.panel}>
-  <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-    ⏱ Temps : {duration}s
-  </Text>
-  <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-  📏 Disstance :{" "}
-  {distance < 1000
-    ? `${Math.round(distance)} m`
-    : `${(distance / 1000).toFixed(2)} km`}
-</Text>
-<Text style={{ fontSize: 18, fontWeight: "bold" }}>
-  🚀 Vitesse : {speed.toFixed(2)} km/h
-</Text>
+    <View style={styles.panel}>
+      <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+        ⏱ Temps : {formatDuration(duration)}
+      </Text>
+      <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+        📏 Distance :{" "}
+        {distance < 1000
+          ? `${Math.round(distance)} m`
+          : `${(distance / 1000).toFixed(2)} km`}
+      </Text>
+      <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+        🚀 Vitesse : {speed.toFixed(2)} km/h
+      </Text>
 
-
-  <Button title="Arrêter la course" onPress={handleStop} />
-</View>
-
+      {!running ? (
+        <Button title="Démarrer la course" onPress={startRun} />
+      ) : paused ? (
+        <Button title="Reprendre" onPress={startRun} />
+      ) : (
+        <>
+          <Button title="Pause" onPress={pauseRun} />
+          <View style={{ marginTop: 10 }} />
+          <Button title="Arrêter la course" onPress={handleStop} />
+        </>
+      )}
     </View>
-  );
+  </View>
+);
+
 }
 
 function getDistanceFromLatLon(lat1: number, lon1: number, lat2: number, lon2: number) {

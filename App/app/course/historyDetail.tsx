@@ -11,7 +11,18 @@ type Course = {
   start_time: string;
   path?: string;
   email?: string;
+  avg_speed?: number;
+
 };
+
+function formatDuration(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+
+  const min = Math.floor(seconds / 60);
+  const sec = seconds % 60;
+  return `${min}min ${sec}s`;
+}
+
 
 export default function HistoryDetailScreen() {
     
@@ -81,8 +92,12 @@ export default function HistoryDetailScreen() {
 
       <View style={styles.info}>
         <Text>📏 Distance : {course.distance.toFixed(2)} km</Text>
-        <Text>⏱ Durée : {course.duration}s</Text>
+        <Text>⏱ Durée : {formatDuration(course.duration)}</Text>
         <Text>🕒 Date : {new Date(course.start_time).toLocaleString()}</Text>
+        {course.avg_speed != null && (
+  <Text>🚀 Vitesse moyenne : {course.avg_speed.toFixed(2)} km/h</Text>
+)}
+
         
 
         {course.email && <Text>📧 Utilisateur : {course.email}</Text>}

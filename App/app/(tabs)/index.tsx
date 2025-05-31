@@ -19,6 +19,15 @@ type Stats = {
   distance : number;
 };
 
+function formatDuration(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+
+  const min = Math.floor(seconds / 60);
+  const sec = seconds % 60;
+  return `${min}min ${sec}s`;
+}
+
+
 export default function HomeScreen() {
   const [lastCourse, setLastCourse] = useState<Course | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -89,7 +98,7 @@ export default function HomeScreen() {
         {lastCourse ? (
           <>
             <Text>📅 {new Date(lastCourse.start_time).toLocaleString()}</Text>
-            <Text>📍 {lastCourse.distance.toFixed(2)} km en {lastCourse.duration}s</Text>
+            <Text>📍 {lastCourse.distance.toFixed(2)} km en {formatDuration(lastCourse.duration)}</Text>
 
             {path.length > 1 ? (
               <MapView

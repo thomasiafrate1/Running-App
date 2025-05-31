@@ -24,6 +24,15 @@ type Course = {
   path?: string; // JSON.stringify(path) stocké dans MySQL
 };
 
+function formatDuration(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+
+  const min = Math.floor(seconds / 60);
+  const sec = seconds % 60;
+  return `${min}min ${sec}s`;
+}
+
+
 export default function HistoryScreen() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [viewMode, setViewMode] = useState<"mine" | "recent">("mine");
@@ -90,7 +99,7 @@ export default function HistoryScreen() {
           )}
 
           <View style={styles.info}>
-            <Text>📍 {item.distance.toFixed(2)} km en {item.duration}s</Text>
+            <Text>📍 {item.distance.toFixed(2)} km en {formatDuration(item.duration)}</Text>
             <Text>🕒 {new Date(item.start_time).toLocaleString()}</Text>
             {viewMode === "recent" && item.email && (
               <Text>📧 {item.email}</Text>
