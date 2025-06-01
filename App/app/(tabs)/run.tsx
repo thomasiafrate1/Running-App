@@ -176,7 +176,22 @@ const startRun = () => {
     });
 
     Alert.alert("Course enregistrée !");
+    if (distance / 1000 >= 2) { // ✔️ tu peux ajuster ce seuil selon ton objectif
+  try {
+    await fetch("http://192.168.1.64:3000/api/goals/complete", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log("🎯 Objectif quotidien validé !");
+  } catch (err) {
+    console.error("❌ Erreur lors de la validation de l’objectif", err);
+  }
+}
+
     router.replace("/");
+
   };
 
   if (!location) {

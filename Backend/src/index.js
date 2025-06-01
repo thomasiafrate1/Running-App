@@ -13,6 +13,8 @@ app.use(express.json());
 
 const authRoutes = require("./routes/auth");
 app.use("/api/auth", authRoutes);
+app.use("/api/goals", require("./routes/goals"));
+
 
 app.get("/", (req, res) => {
   res.send("API de Running prête !");

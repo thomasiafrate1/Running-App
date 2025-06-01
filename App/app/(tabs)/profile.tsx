@@ -17,9 +17,22 @@ export default function ProfileScreen() {
   const [user, setUser] = useState<{ id: number; email: string } | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const router = useRouter();
+  const [goalHistory, setGoalHistory] = useState([]);
+
   
 
 useEffect(() => {
+
+  const fetchGoalHistory = async () => {
+  const token = await getToken();
+  const res = await fetch("http://192.168.1.64:3000/api/goals/history", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  setGoalHistory(data);
+};
+
+
   const fetchStats = async () => {
     try {
       console.log("🔄 Tentative de récupération du token...");
@@ -65,6 +78,21 @@ useEffect(() => {
 
       fetchStats();
 
+      const createDailyGoal = async () => {
+    const token = await getToken();
+    try {
+      await fetch("http://192.168.1.64:3000/api/goals/daily", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (err) {
+      console.error("Erreur lors de la création de l’objectif quotidien", err);
+    }
+  };
+
+  createDailyGoal();
+
 }, []);
 
 
@@ -104,6 +132,20 @@ useEffect(() => {
     : "N/A"}{" "}
   km/h
 </Text>
+<View>
+  <Text style={styles.subTitle}>📅 Historique Objectifs</Text>
+  <Text>
+    ✅ Objectifs atteints :{" "}
+    {goalHistory.filter((g) => g.completed).length} / {goalHistory.length}
+  </Text>
+
+  {goalHistory.map((goal, i) => (
+    <Text key={i}>
+      {goal.date} – {goal.label} – {goal.completed ? "✅" : "❌"}
+    </Text>
+  ))}
+</View>
+
 
 
 

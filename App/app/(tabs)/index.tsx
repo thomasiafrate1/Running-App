@@ -32,6 +32,11 @@ export default function HomeScreen() {
   const [lastCourse, setLastCourse] = useState<Course | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
+  const [dailyGoal, setDailyGoal] = useState<{
+  label: string;
+  completed: boolean;
+} | null>(null);
+
   
 
   useFocusEffect(
@@ -51,6 +56,17 @@ export default function HomeScreen() {
         const courses = await resCourses.json();
 
         setStats(statsData);
+
+        // Objectif du jour : courir au moins 2 km
+        const objectifAtteint =
+          courses.length > 0 && courses[0].distance >= 2;
+
+        setDailyGoal({
+          label: "Courir au moins 2 km",
+          completed: objectifAtteint,
+        });
+
+
         if (courses.length > 0) {
           setLastCourse(courses[0]);
           if (courses[0].path) {
@@ -122,6 +138,16 @@ export default function HomeScreen() {
           <Text>Pas encore de course enregistrée</Text>
         )}
       </View>
+      {dailyGoal && (
+  <View style={{ marginVertical: 10 }}>
+    <Text style={{ fontWeight: "bold" }}>🎯 Objectif du jour :</Text>
+    <Text>{dailyGoal.label}</Text>
+    <Text style={{ color: dailyGoal.completed ? "green" : "red" }}>
+      {dailyGoal.completed ? "✅ Objectif atteint !" : "❌ Pas encore atteint"}
+    </Text>
+  </View>
+)}
+
     </ScrollView>
   );
 }
