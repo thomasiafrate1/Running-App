@@ -24,6 +24,9 @@ export default function RunScreen() {
 const pathRef = useRef<{ latitude: number; longitude: number }[]>([]);
 const [speed, setSpeed] = useState(0);
 const [paused, setPaused] = useState(false);
+const [goalMode, setGoalMode] = useState(false); // mode objectif
+const [targetPoint, setTargetPoint] = useState<{ latitude: number; longitude: number } | null>(null); // point d'arrivée
+
 
 
 
@@ -105,6 +108,24 @@ const startRun = () => {
       timestamp: Date.now(),
     };
 
+    if (targetPoint) {
+  const distToTarget = getDistanceFromLatLon(
+    newPoint.latitude,
+    newPoint.longitude,
+    targetPoint.latitude,
+    targetPoint.longitude
+  );
+
+  console.log("🎯 Distance vers objectif :", distToTarget.toFixed(2), "m");
+
+  if (distToTarget < 20) { // Seuil de 20m
+    console.log("✅ Objectif atteint !");
+    handleStop();
+    return;
+  }
+}
+
+
     if (pathRef.current.length > 0) {
       const prevPoint = pathRef.current[pathRef.current.length - 1];
       const dist = getDistanceFromLatLon(
@@ -166,7 +187,7 @@ const startRun = () => {
     );
   }
 
-  return (
+return (
   <View style={{ flex: 1 }}>
     <MapView
       style={{ flex: 1 }}
@@ -177,11 +198,48 @@ const startRun = () => {
         longitudeDelta: 0.01,
       }}
       showsUserLocation
+      onPress={(e) => {
+        if (!running && goalMode) {
+          const coord = e.nativeEvent.coordinate;
+          setTargetPoint(coord);
+          console.log("🎯 Point d'arrivée défini :", coord);
+        }
+      }}
     >
+      {/* Trajet effectué */}
       <Polyline coordinates={path} strokeColor="blue" strokeWidth={4} />
+
+      {/* Trait A ➝ B si en mode objectif */}
+      {goalMode && targetPoint && location && (
+        <Polyline
+          coordinates={[
+            {
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            },
+            targetPoint,
+          ]}
+          strokeColor="green"
+          strokeDasharray={[5, 5]}
+          strokeWidth={2}
+        />
+      )}
     </MapView>
 
     <View style={styles.panel}>
+      {/* Mode objectif : bouton pour activer/désactiver */}
+      <View style={{ marginBottom: 10 }}>
+        <Button
+          title={goalMode ? "🎯 Mode objectif activé" : "🏃 Mode libre activé"}
+          color={goalMode ? "#4caf50" : "#2196f3"}
+          onPress={() => {
+            setGoalMode(!goalMode);
+            setTargetPoint(null); // reset le point si on change de mode
+          }}
+        />
+      </View>
+
+      {/* Infos de la course */}
       <Text style={{ fontSize: 18, fontWeight: "bold" }}>
         ⏱ Temps : {formatDuration(duration)}
       </Text>
@@ -195,6 +253,7 @@ const startRun = () => {
         🚀 Vitesse : {speed.toFixed(2)} km/h
       </Text>
 
+      {/* Boutons : démarrer / pause / stop */}
       {!running ? (
         <Button title="Démarrer la course" onPress={startRun} />
       ) : paused ? (
@@ -209,6 +268,7 @@ const startRun = () => {
     </View>
   </View>
 );
+
 
 }
 
