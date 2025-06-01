@@ -3,7 +3,20 @@ import { View, Text, Button, Alert, StyleSheet } from "react-native";
 import * as Location from "expo-location";
 import MapView, { Polyline } from "react-native-maps";
 import { getToken } from "../../utils/token";
+import * as Notifications from "expo-notifications";
 import { useRouter } from "expo-router";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true, // ✅ Affiche la notif en haut de l'écran
+    shouldShowList: true,   // ✅ Affiche la notif dans le centre de notif
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+
+
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
@@ -12,6 +25,8 @@ function formatDuration(seconds: number): string {
   const sec = seconds % 60;
   return `${min}min ${sec}s`;
 }
+
+
 
 
 export default function RunScreen() {
@@ -40,6 +55,19 @@ const timerInterval = useRef<number | null>(null);
 const locationInterval = useRef<number | null>(null);
 
   useEffect(() => {
+
+    const setupNotifications = async () => {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== "granted") {
+      console.log("🚫 Notifications non autorisées");
+    }
+  };
+
+  setupNotifications();
+
+  
+
+
     const initialize = async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       console.log("Permission GPS :", status); // 👈 très important
@@ -75,6 +103,15 @@ const locationInterval = useRef<number | null>(null);
   setPaused(true);
 };
 
+const sendNotification = async () => {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "🏁 Course terminée",
+      body: `Tu as couru ${(distance / 1000).toFixed(2)} km en ${formatDuration(duration)} !`,
+    },
+    trigger: null, // immédiat
+  });
+};
 
 const startRun = () => {
   if (paused) {
@@ -189,6 +226,7 @@ const startRun = () => {
     console.error("❌ Erreur lors de la validation de l’objectif", err);
   }
 }
+  await sendNotification();
 
     router.replace("/");
 
@@ -204,6 +242,8 @@ const startRun = () => {
 
 return (
   <View style={{ flex: 1 }}>
+    <Button title="🔔 Tester Notification" onPress={sendNotification} />
+
     <MapView
       style={{ flex: 1 }}
       initialRegion={{
