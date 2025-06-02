@@ -14,6 +14,8 @@ app.use(express.json());
 const authRoutes = require("./routes/auth");
 app.use("/api/auth", authRoutes);
 app.use("/api/goals", require("./routes/goals"));
+app.use("/api/admin", require("./routes/admin"));
+
 
 
 app.get("/", (req, res) => {

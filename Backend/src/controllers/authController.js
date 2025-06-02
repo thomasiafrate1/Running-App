@@ -39,3 +39,30 @@ exports.loginUser = (req, res) => {
     res.json({ message: "Connexion réussie", token });
   });
 };
+
+// Pour les admins seulement
+exports.loginAdmin = (req, res) => {
+  const { email, password } = req.body;
+
+  db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
+    if (err || results.length === 0)
+      return res.status(401).json({ message: "Email invalide" });
+
+    const user = results[0];
+
+    if (user.role !== "admin") {
+      return res.status(403).json({ message: "Accès refusé : pas admin" });
+    }
+
+    const valid = bcrypt.compareSync(password, user.password);
+    if (!valid)
+      return res.status(401).json({ message: "Mot de passe incorrect" });
+
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
+      expiresIn: "24h",
+    });
+
+    res.json({ message: "Connexion réussie", token });
+  });
+};
+
