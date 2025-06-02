@@ -45,10 +45,10 @@ export default function HomeScreen() {
       const token = await getToken();
 
       try {
-        const resStats = await fetch(`http://192.168.1.64:3000/api/courses/stats`, {
+        const resStats = await fetch(`http://10.188.218.47:3000/api/courses/stats`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const resCourses = await fetch(`http://192.168.1.64:3000/api/courses`, {
+        const resCourses = await fetch(`http://10.188.218.47:3000/api/courses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

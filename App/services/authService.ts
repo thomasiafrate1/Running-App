@@ -1,5 +1,4 @@
-const API_URL = "http://192.168.1.64:3000/api";
- // ← Mets ici l'IP locale de ton PC
+const API_URL = "http://10.188.218.47:3000/api";
 
 export const login = async (email: string, password: string) => {
   const res = await fetch(`${API_URL}/auth/login`, {
