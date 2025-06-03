@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
 import { getToken, removeToken } from "../../utils/token";
 import { useRouter } from "expo-router";
 
@@ -102,68 +102,137 @@ useEffect(() => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>👤 Profil</Text>
+  <View style={styles.container}>
+    <Text style={styles.title}>Profil</Text>
 
-      {user && (
-        <>
-          <Text style={styles.text}>Email : {user.email}</Text>
-          <Text style={styles.text}>ID : {user.id}</Text>
-        </>
-      )}
-
-      <View style={styles.stats}>
-        <Text style={styles.subTitle}>📊 Mes statistiques</Text>
-        {stats ? (
-          <>
-            <Text>🏃 Courses : {stats.totalCourses}</Text>
-            <Text>
-  📍{" "}
-  {typeof stats.totalDistance === "number"
-    ? `${stats.totalDistance.toFixed(2)} km`
-    : "Distance inconnue"}{" "}
-  
-</Text>
-            <Text>⏱ Temps total : {Math.round(stats.totalDuration / 60)} min</Text>
-            <Text>
-  🚀 Vitesse moyenne :{" "}
-  {stats.avgSpeed != null
-    ? stats.avgSpeed.toFixed(2)
-    : "N/A"}{" "}
-  km/h
-</Text>
-<View>
-  <Text style={styles.subTitle}>📅 Historique Objectifs</Text>
-  <Text>
-    ✅ Objectifs atteints :{" "}
-    {goalHistory.filter((g) => g.completed).length} / {goalHistory.length}
-  </Text>
-
-  {goalHistory.map((goal, i) => (
-    <Text key={i}>
-      {goal.date} – {goal.label} – {goal.completed ? "✅" : "❌"}
-    </Text>
-  ))}
-</View>
-
-
-
-
-          </>
-        ) : (
-          <Text>Chargement des stats...</Text>
-        )}
+    {user && (
+      <View style={styles.userBox}>
+        <Text style={styles.userText}>{user.email}</Text>
+        <Text style={styles.userText}>ID : {user.id}</Text>
       </View>
+    )}
 
-      <Button title="Se déconnecter" color="#ff4444" onPress={handleLogout} />
+    {stats && (
+      <>
+        <View style={styles.statsContainer}>
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>{stats.totalCourses}</Text>
+            <Text style={styles.statLabel}>Courses</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>{stats.totalDistance.toFixed(2)} km</Text>
+            <Text style={styles.statLabel}>Distance</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>{Math.round(stats.totalDuration / 60)} min</Text>
+            <Text style={styles.statLabel}>Temps total</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>
+              {stats.avgSpeed != null ? stats.avgSpeed.toFixed(2) : "N/A"} km/h
+            </Text>
+            <Text style={styles.statLabel}>Vitesse moy.</Text>
+          </View>
+        </View>
+
+        <View style={styles.goalSection}>
+          <Text style={styles.subTitle}>Objectifs Accomplis</Text>
+          <Text style={styles.goalSummary}>
+            {goalHistory.filter(g => g.completed).length} 
+          </Text>
+        </View>
+      </>
+    )}
+
+    <View style={styles.bottom}>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutText}>Se déconnecter</Text>
+      </TouchableOpacity>
     </View>
-  );
+  </View>
+);
+
+
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 26, fontWeight: "bold", marginBottom: 15 },
-  text: { fontSize: 16, marginBottom: 5 },
-  subTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
-  stats: { marginVertical: 20 },
+  container: {
+    flex: 1,
+    backgroundColor: "#1c1c1c",
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#fdd835",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  userBox: {
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  userText: {
+    fontSize: 22,
+    color: "white",
+    marginBottom: 4,
+  },
+  statsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 20,
+  },
+  statBox: {
+    width: 130,
+    height: 70,
+    backgroundColor: "#2c2c2c",
+    borderColor: "#fdd835",
+    borderWidth: 1,
+    borderRadius: 0,
+    margin: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  statValue: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fdd835",
+  },
+  statLabel: {
+    fontSize: 13,
+    color: "#ccc",
+    marginTop: 4,
+  },
+  goalSection: {
+    marginTop: 30,
+    alignItems: "center",
+  },
+  subTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fdd835",
+    marginBottom: 8,
+  },
+  goalSummary: {
+    fontSize: 16,
+    color: "white",
+  },
+  bottom: {
+    marginTop: "auto",
+    width: "100%",
+  },
+  logoutButton: {
+    backgroundColor: "#fdd835",
+    padding: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  logoutText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#1c1c1c",
+  },
 });

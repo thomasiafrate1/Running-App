@@ -22,15 +22,17 @@ type Course = {
   duration: number;
   start_time: string;
   path?: string; // JSON.stringify(path) stocké dans MySQL
+  avg_speed?: number;
 };
 
-function formatDuration(seconds: number): string {
-  if (seconds < 60) return `${seconds}s`;
-
+function formatDurationParts(seconds: number): { value: string; unit: string } {
+  if (seconds < 60) {
+    return { value: `${seconds}`, unit: "s" };
+  }
   const min = Math.floor(seconds / 60);
-  const sec = seconds % 60;
-  return `${min}min ${sec}s`;
+  return { value: `${min}`, unit: "min" };
 }
+
 
 
 export default function HistoryScreen() {
@@ -75,55 +77,87 @@ export default function HistoryScreen() {
       : `/course/historyDetail?id=${item.id}`
   )
 }>
+  <Text style={styles.dateText}>
+        {new Date(item.start_time).toLocaleString()}
+    </Text>
         <View style={styles.courseRow}>
-          {path.length > 1 ? (
-            <MapView
-              style={styles.map}
-              initialRegion={{
-                latitude: path[0].latitude,
-                longitude: path[0].longitude,
-                latitudeDelta: 0.002,
-                longitudeDelta: 0.002,
-              }}
-              scrollEnabled={false}
-              zoomEnabled={false}
-              pitchEnabled={false}
-              rotateEnabled={false}
-            >
-              <Polyline coordinates={path} strokeColor="blue" strokeWidth={3} />
-            </MapView>
-          ) : (
-            <View style={styles.placeholderMap}>
-              <Text>Pas de trace</Text>
-            </View>
-          )}
+              
+  {path.length > 1 ? (
+    
+    <MapView
+      style={styles.map}
+      initialRegion={{
+        latitude: path[0].latitude,
+        longitude: path[0].longitude,
+        latitudeDelta: 0.002,
+        longitudeDelta: 0.002,
+      }}
+      scrollEnabled={false}
+      zoomEnabled={false}
+      pitchEnabled={false}
+      rotateEnabled={false}
+    >
+      <Polyline coordinates={path} strokeColor="#fdd835" strokeWidth={3} />
+    </MapView>
+  ) : (
+    <View style={styles.placeholderMap}>
+      <Text style={{ color: "white" }}>Pas de trace</Text>
+    </View>
+  )}
 
-          <View style={styles.info}>
-            <Text>📍 {item.distance.toFixed(2)} km en {formatDuration(item.duration)}</Text>
-            <Text>🕒 {new Date(item.start_time).toLocaleString()}</Text>
-            {viewMode === "recent" && item.email && (
-              <Text>📧 {item.email}</Text>
-            )}
-          </View>
-        </View>
+  <View style={styles.info}>
+    
+    {viewMode === "recent" && item.email && (
+      <Text style={styles.emailText}> {item.email}</Text>
+    )}
+    <View style={styles.testCourseRow}>
+      <Text style={styles.infoText}>
+        {item.distance.toFixed(2)} <Text style={{color : "white"}}>km</Text>
+      </Text>
+      {(() => {
+  const { value, unit } = formatDurationParts(item.duration);
+  return (
+    <Text style={styles.infoText}>
+      {value}
+      <Text style={{ color: "white" }}> {unit}</Text>
+    </Text>
+  );
+})()}
+
+
+    </View>
+    {item.avg_speed != null && (
+    <View style={styles.row}>
+      <Text style={styles.infoText}>
+        {item.avg_speed.toFixed(2)} <Text style={{ color: "white" }}>km/h</Text>
+      </Text>
+    </View>
+  )}
+
+
+    
+  </View>
+</View>
+
       </TouchableOpacity>
     );
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🏃 Historique des courses</Text>
+      <Text style={styles.title}>Historique des courses</Text>
 
       <View style={styles.buttonRow}>
         <Button
           title="Mes courses"
           onPress={() => setViewMode("mine")}
-          color={viewMode === "mine" ? "#1e90ff" : "gray"}
+          color={viewMode === "mine" ? "#f6b500" : "gray"}
         />
         <Button
           title="Dernières courses"
           onPress={() => setViewMode("recent")}
-          color={viewMode === "recent" ? "#1e90ff" : "gray"}
+          color={viewMode === "recent" ? "#f6b500" : "gray"}
+          
         />
       </View>
 
@@ -141,38 +175,99 @@ export default function HistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 10 },
+  container: {
+    flex: 1,
+    backgroundColor: "#1c1c1c",
+    padding: 15,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#f6b500",
+    marginBottom: 20,
+    textAlign: "center",
+  },
   buttonRow: {
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: 15,
+
   },
-  loading: { textAlign: "center", marginTop: 20 },
+
+  dateText : {
+    zIndex: 1000,
+    position : "absolute",
+    right : 0,
+    top : 15,
+    color : "#f6b500",
+  },
+
+
+  loading: {
+    color: "white",
+    textAlign: "center",
+    marginTop: 20,
+  },
   courseRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f2f2f2",
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 10,
-    gap: 10,
+    flexDirection: "row", // 📍 map à gauche, infos à droite
+    marginTop : 35,
+    backgroundColor: "#2b2b2b",
+    borderRadius: 0,
+    marginBottom: 15,
+    borderTopColor: "#fdd835",
+    borderBottomColor: "#fdd835",
+    borderWidth: 1,
+    overflow: "hidden",
+    
   },
+  row: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  marginTop: 4,
+  marginLeft: 20,
+  marginRight: 20,
+},
+
   map: {
     width: 120,
     height: 100,
-    borderRadius: 8,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
   },
   placeholderMap: {
     width: 120,
     height: 100,
-    borderRadius: 8,
-    backgroundColor: "#ddd",
+    backgroundColor: "#444",
     justifyContent: "center",
     alignItems: "center",
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+  },
+
+  testCourseRow:{
+        flexDirection: "row",
+        position: "relative",
+    justifyContent: "space-between",
+    marginLeft: 25,
+    marginRight: 25
   },
   info: {
     flex: 1,
+    padding: 10,
     justifyContent: "center",
   },
+  infoText: {
+    color: "#f6b500",
+    fontSize: 14,
+    marginBottom: 4,
+
+  },
+  emailText: {
+    color: "#fdd835",
+    fontSize: 17,
+    fontStyle: "italic",
+    fontWeight:"bold"
+  },
 });
+
+

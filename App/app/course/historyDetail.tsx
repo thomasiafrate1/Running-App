@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from "react-native";
 import MapView, { Polyline } from "react-native-maps";
 import { useLocalSearchParams } from "expo-router";
 import { getToken } from "../../utils/token";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+
 
 type Course = {
   id: number;
@@ -30,6 +33,8 @@ export default function HistoryDetailScreen() {
   const [course, setCourse] = useState<Course | null>(null);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -70,7 +75,13 @@ export default function HistoryDetailScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>📍 Détails de la course</Text>
+      <View style={styles.header}>
+  <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+    <Ionicons name="arrow-back" size={24} color="#fdd835" />
+  </TouchableOpacity>
+  <Text style={styles.title}>     Détails de la course</Text>
+</View>
+
 
       {path.length > 0 ? (
         <MapView
@@ -89,45 +100,96 @@ export default function HistoryDetailScreen() {
           <Text>Pas de trace GPS</Text>
         </View>
       )}
-
+        {course.email && (
+    <Text style={styles.infoText}>{course.email}</Text>
+  )}
       <View style={styles.info}>
-        <Text>📏 Distance : {course.distance.toFixed(2)} km</Text>
-        <Text>⏱ Durée : {formatDuration(course.duration)}</Text>
-        <Text>🕒 Date : {new Date(course.start_time).toLocaleString()}</Text>
-        {course.avg_speed != null && (
-  <Text>🚀 Vitesse moyenne : {course.avg_speed.toFixed(2)} km/h</Text>
-)}
+        <Text style={styles.infoBox}>{course.distance.toFixed(2)} km</Text>
+        <Text style={styles.infoBox}>{formatDuration(course.duration)}</Text>
+  
 
-        
-
-        {course.email && <Text>📧 Utilisateur : {course.email}</Text>}
-      </View>
+</View>
+  <View style={styles.info}>
+    <Text style={styles.infoBox}>{new Date(course.start_time).toLocaleString()}</Text>
+  {course.avg_speed != null && (
+    <Text style={styles.infoBox}>{course.avg_speed.toFixed(2)} km/h</Text>
+  )}
+  </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 15 },
+  container: {
+    padding: 20,
+    backgroundColor: "#1c1c1c",
+    height : "100%",
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#1c1c1c",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#fdd835", // Jaune
+    marginBottom: 20,
+    textAlign: "center",
+  },
   map: {
     width: "100%",
     height: 300,
-    borderRadius: 10,
-    marginBottom: 20,
+    borderRadius: 12,
+    marginBottom:25
+
   },
   noMap: {
     height: 300,
-    backgroundColor: "#eee",
+    backgroundColor: "#333",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 10,
+    borderRadius: 12,
     marginBottom: 20,
   },
   info: {
-    gap: 10,
     padding: 15,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 10,
+    borderRadius: 12,
+    gap: 8,
+    display:"flex",
+    flexDirection:"row",
+    justifyContent:"space-between",
+    marginLeft:20,
+    marginRight:20
   },
+  infoText: {
+    color: "#fff",
+    fontSize: 25,
+    textAlign:"center",
+    marginBottom:25,
+    fontWeight:"bold"
+  },
+    infoBox: {
+    color: "#fff",
+    borderColor:"#fdd835",
+    borderWidth: 2,
+    fontSize: 17,
+    width:110,
+    padding: 16,
+    textAlign:"center",
+    alignContent:"center",
+    alignItems:"center"
+  },
+  header: {
+  flexDirection: "row",
+  alignItems: "center",
+  marginBottom: 20,
+},
+backButton: {
+  marginRight: 10,
+  padding: 4,
+},
+
 });
+

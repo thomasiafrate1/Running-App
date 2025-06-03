@@ -42,6 +42,65 @@ const [paused, setPaused] = useState(false);
 const [goalMode, setGoalMode] = useState(false); // mode objectif
 const [targetPoint, setTargetPoint] = useState<{ latitude: number; longitude: number } | null>(null); // point d'arrivée
 
+  const darkMapStyle = [
+  {
+    elementType: "geometry",
+    stylers: [{ color: "#212121" }],
+  },
+  {
+    elementType: "labels.icon",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#757575" }],
+  },
+  {
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#212121" }],
+  },
+  {
+    featureType: "administrative",
+    elementType: "geometry",
+    stylers: [{ color: "#757575" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#757575" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ color: "#181818" }],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#2c2c2c" }],
+  },
+  {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#8a8a8a" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#3c3c3c" }],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ color: "#000000" }],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#3d3d3d" }],
+  },
+];
+
 
 
 
@@ -235,14 +294,14 @@ const startRun = () => {
   if (!location) {
     return (
       <View style={styles.center}>
-        <Text>Chargement de la position GPS...</Text>
+        <Text style={{color:"white"}}>Chargement de la position GPS...</Text>
       </View>
     );
   }
 
 return (
   <View style={{ flex: 1 }}>
-    <Button title="🔔 Tester Notification" onPress={sendNotification} />
+    
 
     <MapView
       style={{ flex: 1 }}
@@ -252,6 +311,7 @@ return (
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       }}
+      customMapStyle={darkMapStyle}
       showsUserLocation
       onPress={(e) => {
         if (!running && goalMode) {
@@ -277,50 +337,63 @@ return (
           strokeColor="green"
           strokeDasharray={[5, 5]}
           strokeWidth={2}
+          
         />
       )}
     </MapView>
+    
 
     <View style={styles.panel}>
-      {/* Mode objectif : bouton pour activer/désactiver */}
-      <View style={{ marginBottom: 10 }}>
+      <View style={styles.button2}>
         <Button
           title={goalMode ? "🎯 Mode objectif activé" : "🏃 Mode libre activé"}
-          color={goalMode ? "#4caf50" : "#2196f3"}
+          color={goalMode ? "#f6b500" :"rgb(33, 243, 68)"}
+          
           onPress={() => {
             setGoalMode(!goalMode);
-            setTargetPoint(null); // reset le point si on change de mode
+            setTargetPoint(null); 
           }}
         />
       </View>
-
-      {/* Infos de la course */}
-      <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-        ⏱ Temps : {formatDuration(duration)}
-      </Text>
-      <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-        📏 Distance :{" "}
+  <View style={styles.statsRow}>
+    <View style={styles.statBox}>
+      <Text style={styles.statLabel}>Durée</Text>
+      <Text style={styles.statValue}>{formatDuration(duration)}</Text>
+    </View>
+    <View style={styles.statBox}>
+      <Text style={styles.statLabel}>Distance</Text>
+      <Text style={styles.statValue}>
         {distance < 1000
           ? `${Math.round(distance)} m`
           : `${(distance / 1000).toFixed(2)} km`}
       </Text>
-      <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-        🚀 Vitesse : {speed.toFixed(2)} km/h
-      </Text>
-
-      {/* Boutons : démarrer / pause / stop */}
-      {!running ? (
-        <Button title="Démarrer la course" onPress={startRun} />
-      ) : paused ? (
-        <Button title="Reprendre" onPress={startRun} />
-      ) : (
-        <>
-          <Button title="Pause" onPress={pauseRun} />
-          <View style={{ marginTop: 10 }} />
-          <Button title="Arrêter la course" onPress={handleStop} />
-        </>
-      )}
     </View>
+    <View style={styles.statBox}>
+      <Text style={styles.statLabel}>Vitesse</Text>
+      <Text style={styles.statValue}>{speed.toFixed(1)} km/h</Text>
+    </View>
+  </View>
+
+  {!running ? (
+    <View style={styles.button}>
+      <Text style={styles.buttonText} onPress={startRun}>Démarrer</Text>
+    </View>
+  ) : paused ? (
+    <View style={styles.button}>
+      <Text style={styles.buttonText} onPress={startRun}>Reprendre</Text>
+    </View>
+  ) : (
+    <>
+      <View style={styles.button}>
+        <Text style={styles.buttonText} onPress={pauseRun}>Pause</Text>
+      </View>
+      <View style={styles.button}>
+        <Text style={styles.buttonText} onPress={handleStop}>Terminer</Text>
+      </View>
+    </>
+  )}
+</View>
+
   </View>
 );
 
@@ -342,15 +415,59 @@ function deg2rad(deg: number) {
 }
 
 const styles = StyleSheet.create({
-  panel: {
-    backgroundColor: "white",
-    padding: 15,
-    borderTopWidth: 1,
-    borderColor: "#ccc",
-  },
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#121212",
+  },
+  panel: {
+    backgroundColor: "#121212", // fond noir
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    borderTopWidth: 1,
+    borderColor: "#333",
+  },
+  statsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  statBox: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 15,
+    marginHorizontal: 5,
+    borderWidth: 2,
+    borderColor: "#f6b500",
+    borderRadius: 8,
+  },
+  statLabel: {
+    color: "#f6b500",
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 5,
+  },
+  statValue: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  button: {
+    backgroundColor: "#f6b500",
+    paddingVertical: 12,
+    marginTop: 10,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#000",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  button2: {
+    marginBottom:20,
+    
   },
 });
+

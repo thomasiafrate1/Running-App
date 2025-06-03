@@ -32,6 +32,67 @@ export default function HomeScreen() {
   const [lastCourse, setLastCourse] = useState<Course | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
+
+  const darkMapStyle = [
+  {
+    elementType: "geometry",
+    stylers: [{ color: "#212121" }],
+  },
+  {
+    elementType: "labels.icon",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#757575" }],
+  },
+  {
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#212121" }],
+  },
+  {
+    featureType: "administrative",
+    elementType: "geometry",
+    stylers: [{ color: "#757575" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#757575" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ color: "#181818" }],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#2c2c2c" }],
+  },
+  {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#8a8a8a" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#3c3c3c" }],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ color: "#000000" }],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#3d3d3d" }],
+  },
+];
+
+
   const [dailyGoal, setDailyGoal] = useState<{
   label: string;
   completed: boolean;
@@ -87,22 +148,22 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>🏠 Tableau de bord</Text>
+      <Text style={styles.title}>Tableau de bord</Text>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>📊 Mes statistiques</Text>
+        <Text style={styles.sectionTitle}>Mes statistiques</Text>
         {stats ? (
           <>
-            <Text>🏃 Courses : {stats.totalCourses}</Text>
-            <Text>
-  📍{" "}
+            <Text style={styles.text}>Courses : {stats.totalCourses}</Text>
+            <Text style={styles.text}>
+  {" "}
   {typeof stats.totalDistance === "number"
     ? `${stats.totalDistance.toFixed(2)} km`
     : "Distance inconnue"}{" "}
   
 </Text>
 
-            <Text>⏱ Durée total : {Math.round(stats.totalDuration / 60)} min</Text>
+            <Text style={styles.text}>Durée total : {Math.round(stats.totalDuration / 60)} min</Text>
           </>
         ) : (
           <Text>Chargement...</Text>
@@ -110,11 +171,11 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>🏁 Dernière course</Text>
+        <Text style={styles.sectionTitle}>Dernière course</Text>
         {lastCourse ? (
           <>
-            <Text>📅 {new Date(lastCourse.start_time).toLocaleString()}</Text>
-            <Text>📍 {lastCourse.distance.toFixed(2)} km en {formatDuration(lastCourse.duration)}</Text>
+            <Text style={styles.text}>{new Date(lastCourse.start_time).toLocaleString()}</Text>
+            <Text style={styles.text}>{lastCourse.distance.toFixed(2)} km en {formatDuration(lastCourse.duration)}</Text>
 
             {path.length > 1 ? (
               <MapView
@@ -127,6 +188,7 @@ export default function HomeScreen() {
                 }}
                 scrollEnabled={false}
                 zoomEnabled={false}
+                customMapStyle={darkMapStyle}
               >
                 <Polyline coordinates={path} strokeColor="blue" strokeWidth={3} />
               </MapView>
@@ -140,11 +202,11 @@ export default function HomeScreen() {
       </View>
       {dailyGoal && (
   <View style={{ marginVertical: 10 }}>
-    <Text style={{ fontWeight: "bold" }}>🎯 Objectif du jour :</Text>
-    <Text>{dailyGoal.label}</Text>
-    <Text style={{ color: dailyGoal.completed ? "green" : "red" }}>
-      {dailyGoal.completed ? "✅ Objectif atteint !" : "❌ Pas encore atteint"}
-    </Text>
+    <Text style={{ fontWeight: "bold", color: "#f8b400" }}>Objectif du jour :</Text>
+    <Text style={{color : "#fff"}}>{dailyGoal.label}</Text>
+    <Text style={[styles.goalStatus, dailyGoal.completed ? styles.goalSuccess : styles.goalFail]}>
+  {dailyGoal.completed ? "✅ Objectif atteint !" : "❌ Pas encore atteint"}
+</Text>
   </View>
 )}
 
@@ -153,13 +215,73 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-  title: { fontSize: 26, fontWeight: "bold", marginBottom: 20 },
-  section: { marginBottom: 25 },
-  sectionTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
-  map: {
-    height: 150,
-    marginTop: 10,
+  container: {
+    flex: 1,
+    backgroundColor: "#1c1c1c",
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#fdd835",
+    marginBottom: 25,
+    textAlign: "center",
+  },
+  section: {
+    backgroundColor: "#2c2c2c",
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 20,
+    borderColor: "#fdd835",
+    borderWidth: 1,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    color: "#fdd835",
+    marginBottom: 10,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  text: {
+    color: "#fff",
+    fontSize: 15,
+    marginBottom: 6,
+  },
+  goalContainer: {
+    backgroundColor: "#2c2c2c",
     borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+    borderColor: "#fdd835",
+    borderWidth: 1,
+  },
+  goalTitle: {
+    fontWeight: "bold",
+    fontSize: 16,
+    color: "#fdd835",
+    marginBottom: 5,
+  },
+  goalText: {
+    color: "#fff",
+    marginBottom: 5,
+  },
+  goalStatus: {
+    fontWeight: "bold",
+    marginTop: 8,
+    fontSize: 15,
+  },
+  goalSuccess: {
+    color: "lime",
+  },
+  goalFail: {
+    color: "#ff4d4d",
+  },
+  map: {
+    height: 160,
+    borderRadius: 10,
+    marginTop: 12,
   },
 });
+
+

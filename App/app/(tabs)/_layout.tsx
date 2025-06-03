@@ -1,12 +1,26 @@
-// app/(tabs)/_layout.tsx
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function TabLayout() {
   return (
-    
-    <Tabs 
+    <Tabs
       screenOptions={({ route }) => ({
+        tabBarLabel: (() => {
+          switch (route.name) {
+            case "index":
+              return "Accueil";
+            case "history":
+              return "Historique";
+            case "run":
+              return "Course";
+            case "notifications":
+              return "Notifications";
+            case "profile":
+              return "Profil";
+            default:
+              return "Onglet";
+          }
+        })(),
         tabBarIcon: ({ color, size }) => {
           let iconName: string;
 
@@ -20,6 +34,9 @@ export default function TabLayout() {
             case "history":
               iconName = "time";
               break;
+            case "notifications":
+              iconName = "notifications";
+              break;
             case "profile":
               iconName = "person";
               break;
@@ -29,12 +46,28 @@ export default function TabLayout() {
 
           return <Ionicons name={iconName as any} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "#1e90ff",
-        tabBarInactiveTintColor: "gray",
+        tabBarActiveTintColor: "#fdd835",
+        tabBarInactiveTintColor: "#999",
+        tabBarStyle: {
+          backgroundColor: "#1c1c1c",
+          borderTopWidth: 1,
+          borderTopColor: "#333",
+          height: 65,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "bold",
+        },
         headerShown: false,
       })}
-      
-    />
-    
+    >
+      <Tabs.Screen name="index" />
+      <Tabs.Screen name="history" />
+      <Tabs.Screen name="run" />
+      <Tabs.Screen name="notifications" />
+      <Tabs.Screen name="profile" />
+    </Tabs>
   );
 }
