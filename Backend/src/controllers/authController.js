@@ -3,18 +3,21 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 exports.registerUser = (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, username, profile_picture } = req.body;
 
-  if (!email || !password)
+  if (!email || !password || !username)
     return res.status(400).json({ message: "Champs requis" });
 
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   db.query(
-    "INSERT INTO users (email, password) VALUES (?, ?)",
-    [email, hashedPassword],
+    "INSERT INTO users (email, password, username, profile_picture) VALUES (?, ?, ?, ?)",
+    [email, hashedPassword, username, profile_picture || null],
     (err, result) => {
-      if (err) return res.status(500).json({ message: "Erreur serveur", err });
+      if (err) {
+        console.error("Erreur lors de l'inscription :", err);
+        return res.status(500).json({ message: "Erreur serveur", err });
+      }
       res.status(201).json({ message: "Utilisateur inscrit" });
     }
   );
@@ -36,7 +39,18 @@ exports.loginUser = (req, res) => {
       expiresIn: "24h",
     });
 
-    res.json({ message: "Connexion réussie", token });
+    res.json({
+  message: "Connexion réussie",
+  token,
+  user: {
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    profile_picture: user.profile_picture,
+    role: user.role
+  }
+});
+
   });
 };
 
@@ -74,7 +88,18 @@ exports.loginAdmin = (req, res) => {
       }
     );
 
-    res.json({ message: "Connexion réussie", token });
+    res.json({
+  message: "Connexion réussie",
+  token,
+  user: {
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    profile_picture: user.profile_picture,
+    role: user.role
+  }
+});
+
   });
 };
 
@@ -205,7 +230,8 @@ exports.getTopUsers = (req, res) => {
 
 exports.updateUser = (req, res) => {
   const { id } = req.params;
-  const { email, role } = req.body;
+  const { email, role, username, profile_picture } = req.body;
+
 
   const fields = [];
   const values = [];
@@ -219,6 +245,17 @@ exports.updateUser = (req, res) => {
     fields.push("role = ?");
     values.push(role);
   }
+
+  if (username) {
+  fields.push("username = ?");
+  values.push(username);
+}
+
+if (profile_picture) {
+  fields.push("profile_picture = ?");
+  values.push(profile_picture);
+}
+
 
   if (fields.length === 0) {
     return res.status(400).json({ message: "Aucune donnée à mettre à jour." });
@@ -237,7 +274,7 @@ exports.updateUser = (req, res) => {
 exports.getOneUser = (req, res) => {
   const { id } = req.params;
 
-  db.query("SELECT id, email, role FROM users WHERE id = ?", [id], (err, results) => {
+  db.query("SELECT id, email, role, username, profile_picture FROM users WHERE id = ?", [id], (err, results) => {
     if (err || results.length === 0)
       return res.status(404).json({ message: "Utilisateur introuvable" });
     res.json(results[0]);

@@ -7,7 +7,8 @@ import {
   FlatList,
   StyleSheet,
   Dimensions,
-  TouchableOpacity
+  TouchableOpacity,
+  Image
 } from "react-native";
 import MapView, { Polyline } from "react-native-maps";
 import { getToken } from "../../utils/token";
@@ -18,12 +19,14 @@ type Course = {
   id: number;
   user_id: number;
   email?: string;
+  profile_picture?: string; // 👈 Ajout
   distance: number;
   duration: number;
   start_time: string;
-  path?: string; // JSON.stringify(path) stocké dans MySQL
+  path?: string;
   avg_speed?: number;
 };
+
 
 function formatDurationParts(seconds: number): { value: string; unit: string } {
   if (seconds < 60) {
@@ -68,6 +71,7 @@ export default function HistoryScreen() {
 
   const renderItem = ({ item }: { item: Course }) => {
     const path: PathPoint[] = item.path ? JSON.parse(item.path) : [];
+    console.log("📷 photo de", item.email, "=>", item.profile_picture);
 
     return (
       <TouchableOpacity onPress={() =>
@@ -107,9 +111,24 @@ export default function HistoryScreen() {
 
   <View style={styles.info}>
     
-    {viewMode === "recent" && item.email && (
-      <Text style={styles.emailText}> {item.email}</Text>
+    {viewMode === "recent" && (
+  <View style={styles.userRow}>
+    {item.profile_picture ? (
+      <View style={styles.avatarWrapper}>
+        <Image
+          source={{ uri: item.profile_picture }}
+          style={styles.avatar}
+        />
+      </View>
+    ) : (
+      <View style={styles.avatarPlaceholder}>
+        <Text style={{ color: "#999", fontSize: 10 }}>?</Text>
+      </View>
     )}
+    <Text style={styles.emailText}>{item.email}</Text>
+  </View>
+)}
+
     <View style={styles.testCourseRow}>
       <Text style={styles.infoText}>
         {item.distance.toFixed(2)} <Text style={{color : "white"}}>km</Text>
@@ -193,6 +212,35 @@ const styles = StyleSheet.create({
     marginBottom: 15,
 
   },
+
+  userRow: {
+  flexDirection: "row",
+  alignItems: "center",
+  marginBottom: 8,
+  gap: 8,
+},
+avatarWrapper: {
+  width: 30,
+  height: 30,
+  borderRadius: 15,
+  overflow: "hidden",
+  borderWidth: 1,
+  borderColor: "#fdd835",
+},
+avatar: {
+  width: "100%",
+  height: "100%",
+  resizeMode: "cover",
+},
+avatarPlaceholder: {
+  width: 30,
+  height: 30,
+  borderRadius: 15,
+  backgroundColor: "#444",
+  justifyContent: "center",
+  alignItems: "center",
+},
+
 
   dateText : {
     zIndex: 1000,

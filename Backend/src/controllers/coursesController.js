@@ -106,7 +106,7 @@ exports.getCoursesByUserId = (req, res) => {
 // GET /courses/recent
 exports.getRecentCourses = (req, res) => {
   db.query(
-    `SELECT c.*, u.email 
+    `SELECT c.*, u.email, u.profile_picture
      FROM courses c 
      JOIN users u ON c.user_id = u.id 
      ORDER BY c.start_time DESC 
@@ -123,7 +123,7 @@ exports.getPublicCourseById = (req, res) => {
   const courseId = req.params.id;
 
   db.query(
-    `SELECT c.*, u.email 
+    `SELECT c.*, u.email, u.profile_picture 
      FROM courses c
      JOIN users u ON c.user_id = u.id
      WHERE c.id = ?`,

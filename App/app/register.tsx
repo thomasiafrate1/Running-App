@@ -15,6 +15,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState(""); // ⬅️ Ajouté
   const router = useRouter();
+  const [username, setUsername] = useState("");
 
   const handleRegister = async () => {
     if (password !== confirmPassword) {
@@ -23,7 +24,7 @@ export default function Register() {
     }
 
     try {
-      const data = await register(email, password);
+      const data = await register(email, password, username);
       if (data.message === "Utilisateur inscrit") {
         Alert.alert("Inscription réussie !");
         router.replace("/login");
@@ -38,6 +39,14 @@ export default function Register() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>S'inscrire</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Nom d'utilisateur"
+        placeholderTextColor="#aaa"
+        onChangeText={setUsername}
+        value={username}
+      />
 
       <TextInput
         style={styles.input}

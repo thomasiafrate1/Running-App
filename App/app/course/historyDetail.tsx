@@ -5,6 +5,8 @@ import { useLocalSearchParams } from "expo-router";
 import { getToken } from "../../utils/token";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { Image } from "react-native";
+
 
 
 type Course = {
@@ -14,6 +16,7 @@ type Course = {
   start_time: string;
   path?: string;
   email?: string;
+   profile_picture?: string; // ✅ AJOUTE CECI
   avg_speed?: number;
 
 };
@@ -100,6 +103,22 @@ export default function HistoryDetailScreen() {
           <Text>Pas de trace GPS</Text>
         </View>
       )}
+      {course.profile_picture ? (
+  <View style={{ alignItems: "center", marginBottom: 10 }}>
+    <Image
+      source={{ uri: course.profile_picture }}
+      style={{
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        borderWidth: 2,
+        borderColor: "#fdd835",
+        marginBottom: 10,
+      }}
+    />
+  </View>
+) : null}
+
         {course.email && (
     <Text style={styles.infoText}>{course.email}</Text>
   )}
@@ -167,7 +186,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 25,
     textAlign:"center",
-    marginBottom:25,
+    marginBottom:15,
     fontWeight:"bold"
   },
     infoBox: {
@@ -175,8 +194,8 @@ const styles = StyleSheet.create({
     borderColor:"#fdd835",
     borderWidth: 2,
     fontSize: 17,
-    width:110,
-    padding: 16,
+    width:125,
+    padding: 12,
     textAlign:"center",
     alignContent:"center",
     alignItems:"center"

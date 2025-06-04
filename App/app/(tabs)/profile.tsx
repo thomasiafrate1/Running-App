@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { getToken, removeToken } from "../../utils/token";
 import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
+import { Image } from "react-native";
+
 
 
 
@@ -14,11 +17,57 @@ type Stats = {
 
 
 export default function ProfileScreen() {
-  const [user, setUser] = useState<{ id: number; email: string } | null>(null);
+  const [user, setUser] = useState<{ id: number; email: string; username: string; profile_picture: string | null } | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const router = useRouter();
   const [goalHistory, setGoalHistory] = useState([]);
 
+
+  const updateProfilePicture = async (base64Image: string) => {
+  try {
+    const token = await getToken();
+    const res = await fetch(`http://10.188.218.47:3000/api/auth/${user?.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ profile_picture: base64Image }),
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      Alert.alert("✅ Photo mise à jour !");
+      setUser({ ...user!, profile_picture: base64Image });
+    } else {
+      Alert.alert("Erreur", data.message || "Échec de la mise à jour");
+    }
+  } catch (err) {
+    Alert.alert("Erreur", "Impossible de mettre à jour la photo");
+    console.error(err);
+  }
+};
+
+
+const pickImage = async () => {
+  const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!permission.granted) {
+    Alert.alert("Permission requise", "L'accès à la galerie est nécessaire.");
+    return;
+  }
+
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    allowsEditing: true,
+    quality: 1,
+    base64: true,
+  });
+
+  if (!result.canceled && result.assets.length > 0) {
+    const base64Img = `data:image/jpeg;base64,${result.assets[0].base64}`;
+    updateProfilePicture(base64Img); // 👈 fonction à définir
+  }
+};
   
 
 useEffect(() => {
@@ -30,7 +79,12 @@ useEffect(() => {
   });
   const data = await res.json();
   setGoalHistory(data);
-};
+  };
+
+
+
+
+
 
 
   const fetchStats = async () => {
@@ -92,28 +146,46 @@ useEffect(() => {
   };
 
   createDailyGoal();
+  
 
 }, []);
-
+  
 
   const handleLogout = async () => {
     await removeToken();
     router.replace("/login");
   };
 
+  
+
   return (
   <View style={styles.container}>
     <Text style={styles.title}>Profil</Text>
 
     {user && (
-      <View style={styles.userBox}>
-        <Text style={styles.userText}>{user.email}</Text>
-        <Text style={styles.userText}>ID : {user.id}</Text>
+  <View style={styles.userBox}>
+    {user.profile_picture ? (
+      <View style={styles.avatarWrapper}>
+        <Image source={{ uri: user.profile_picture }} style={styles.avatar} />
+      </View>
+      
+    ) : (
+      <View style={styles.avatarPlaceholder}>
+        <Text style={{ color: "#666" }}>Pas de photo</Text>
       </View>
     )}
+    <TouchableOpacity onPress={pickImage} style={styles.logoutButton}>
+      <Text style={styles.logoutText}>Changer la photo</Text>
+    </TouchableOpacity>
+    <Text style={styles.username}>{user.username}</Text>
+    <Text style={styles.userText}>{user.email}</Text>
+  </View>
+)}
+
 
     {stats && (
       <>
+      
         <View style={styles.statsContainer}>
           <View style={styles.statBox}>
             <Text style={styles.statValue}>{stats.totalCourses}</Text>
@@ -235,4 +307,35 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#1c1c1c",
   },
+
+  avatarWrapper: {
+  width: 100,
+  height: 100,
+  borderRadius: 50,
+  overflow: "hidden",
+  borderWidth: 2,
+  borderColor: "#fdd835",
+  marginBottom: 10,
+},
+avatar: {
+  width: "100%",
+  height: "100%",
+  resizeMode: "cover",
+},
+avatarPlaceholder: {
+  width: 100,
+  height: 100,
+  borderRadius: 50,
+  backgroundColor: "#333",
+  justifyContent: "center",
+  alignItems: "center",
+  marginBottom: 10,
+},
+username: {
+  fontSize: 20,
+  fontWeight: "bold",
+  color: "#fdd835",
+  marginBottom: 5,
+},
+
 });
