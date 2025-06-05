@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/NavBar";
+import "../styles/usercourses.css"
 
 type Course = {
   id: number;
@@ -30,8 +31,9 @@ export default function UserCourses() {
   }, [id]);
 
   return (
+    <>
+    <Navbar />
     <div>
-        <Navbar />
       <h2>Courses de l'utilisateur #{id}</h2>
       <ul>
         {courses.map((c, i) => (
@@ -49,5 +51,7 @@ export default function UserCourses() {
         ))}
       </ul>
     </div>
+    </>
+    
   );
 }

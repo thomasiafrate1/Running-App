@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/style.css"
+import "../styles/login.css"
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -35,7 +35,7 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      <h1>Connexion Admin</h1>
+      <h1 style={{color:"black"}}>Connexion Admin</h1>
       <form onSubmit={handleLogin} className="login-form">
         <label>Email :</label>
         <input

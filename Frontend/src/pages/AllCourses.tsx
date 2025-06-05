@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/NavBar";
+import "../styles/allcourses.css";
+import { MapContainer, TileLayer, Polyline } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+type PathPoint = {
+  latitude: number;
+  longitude: number;
+  timestamp?: string;
+};
 
 type Course = {
   id: number;
@@ -8,6 +18,7 @@ type Course = {
   start_time: string;
   avg_speed: number;
   email: string;
+  path?: PathPoint[] | null;
 };
 
 export default function AllCourses() {
@@ -32,25 +43,44 @@ export default function AllCourses() {
   }, []);
 
   return (
-    <div className="all-courses">
-        <Navbar/>
-      <h2>📋 Toutes les courses</h2>
-      {error && <p className="error">{error}</p>}
-      <ul>
-        {courses.map((course) => (
-          <div key={course.id} className="course-card">
-            <p>👤 {course.email}</p>
-            <p>📅 {new Date(course.start_time).toLocaleString()}</p>
-            <p>📏 Distance : {course.distance.toFixed(2)} km</p>
-            <p>⏱ Durée : {Math.round(course.duration / 60)} min</p>
-<p>
-  🚀 Vitesse moyenne :{" "}
-  {typeof course.avg_speed === "number"
-    ? `${course.avg_speed.toFixed(2)} km/h`
-    : "N/A"}
-</p>          </div>
-        ))}
-      </ul>
-    </div>
+    <>
+      <Navbar />
+      <div className="all-courses">
+        <h2>📍 Toutes les courses</h2>
+        {error && <p className="error">{error}</p>}
+        <ul>
+          {courses.map((course) => (
+            <div key={course.id} className="course-card">
+              <p>👤 {course.email}</p>
+              <p>📅 {new Date(course.start_time).toLocaleString()}</p>
+              <p>📏 Distance : {course.distance.toFixed(2)} km</p>
+              <p>⏱ Durée : {Math.round(course.duration / 60)} min</p>
+              <p>
+                🚀 Vitesse moyenne :{" "}
+                {typeof course.avg_speed === "number"
+                  ? `${course.avg_speed.toFixed(2)} km/h`
+                  : "N/A"}
+              </p>
+
+              {course.path && course.path.length > 0 && (
+                <MapContainer
+                  center={[course.path[0].latitude, course.path[0].longitude] as [number, number]}
+                  zoom={16}
+                  scrollWheelZoom={false}
+                  style={{ height: "200px", marginTop: "1rem", borderRadius: "8px" }}
+                >
+
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  <Polyline
+                    positions={course.path.map((point) => [point.latitude, point.longitude])}
+                    pathOptions={{ color: "#fdd835" }}
+                  />
+                </MapContainer>
+              )}
+            </div>
+          ))}
+        </ul>
+      </div>
+    </>
   );
 }

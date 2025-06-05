@@ -5,7 +5,7 @@ import Users from "./pages/Users";
 import UserCourses from "./pages/UserCourses";
 import UserDetail from "./pages/UserDetail";
 import AllCourses from "./pages/AllCourses";
-
+import GoalTemplateAdmin from "./pages/GoalsAdmin";
 import RecentLogins from "./pages/RecentLogins";
 
 
@@ -21,6 +21,8 @@ export default function App() {
         <Route path="/users/:id/" element={<UserDetail />} />
         <Route path="/courses" element={<AllCourses />} />
         <Route path="/logins" element={<RecentLogins />} />
+        <Route path="/goals" element={<GoalTemplateAdmin />} />
+
       </Routes>
     </BrowserRouter>
   );

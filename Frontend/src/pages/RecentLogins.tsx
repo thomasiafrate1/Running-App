@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/NavBar";
+import "../styles/recentlogin.css"
 
 type Login = {
   id: number;
@@ -32,8 +33,10 @@ export default function RecentLogins() {
   }, []);
 
   return (
-    <div className="recent-logins">
-        <Navbar/>
+    <>
+    <Navbar/>
+     <div className="recent-logins">
+        
       <h2>🕵️ Activité récente</h2>
       {error && <p className="error">{error}</p>}
       <ul>
@@ -46,5 +49,7 @@ export default function RecentLogins() {
         ))}
       </ul>
     </div>
+    </>
+   
   );
 }

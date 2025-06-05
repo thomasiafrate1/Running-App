@@ -95,12 +95,12 @@ export default function HomeScreen() {
 
   const [dailyGoal, setDailyGoal] = useState<{
   label: string;
+  target: number;
+  unit: string;
   completed: boolean;
 } | null>(null);
 
-  
-
-  useFocusEffect(
+useFocusEffect(
   useCallback(() => {
     const fetchData = async () => {
       const token = await getToken();
@@ -112,30 +112,25 @@ export default function HomeScreen() {
         const resCourses = await fetch(`http://10.188.218.47:3000/api/courses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        const resGoal = await fetch(`http://10.188.218.47:3000/api/goals/daily`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         const statsData = await resStats.json();
         const courses = await resCourses.json();
+        const goalData = await resGoal.json();
 
         setStats(statsData);
-
-        // Objectif du jour : courir au moins 2 km
-        const objectifAtteint =
-          courses.length > 0 && courses[0].distance >= 2;
-
-        setDailyGoal({
-          label: "Courir au moins 2 km",
-          completed: objectifAtteint,
-        });
-
 
         if (courses.length > 0) {
           setLastCourse(courses[0]);
           if (courses[0].path) {
             setPath(JSON.parse(courses[0].path));
           }
-        } else {
-          setLastCourse(null); // 👈 gérer le cas aucune course
         }
+
+        setDailyGoal(goalData);
+
       } catch (err) {
         console.error("Erreur de chargement :", err);
       }
@@ -144,6 +139,7 @@ export default function HomeScreen() {
     fetchData();
   }, [])
 );
+
 
 
   return (
@@ -190,7 +186,7 @@ export default function HomeScreen() {
                 zoomEnabled={false}
                 customMapStyle={darkMapStyle}
               >
-                <Polyline coordinates={path} strokeColor="blue" strokeWidth={3} />
+                <Polyline coordinates={path} strokeColor="#fdd835" strokeWidth={3} />
               </MapView>
             ) : (
               <Text style={{ color: "gray" }}>Aucun tracé disponible</Text>
@@ -201,14 +197,22 @@ export default function HomeScreen() {
         )}
       </View>
       {dailyGoal && (
-  <View style={{ marginVertical: 10 }}>
-    <Text style={{ fontWeight: "bold", color: "#f8b400" }}>Objectif du jour :</Text>
-    <Text style={{color : "#fff"}}>{dailyGoal.label}</Text>
-    <Text style={[styles.goalStatus, dailyGoal.completed ? styles.goalSuccess : styles.goalFail]}>
-  {dailyGoal.completed ? "✅ Objectif atteint !" : "❌ Pas encore atteint"}
-</Text>
+  <View style={styles.goalContainer}>
+    <Text style={styles.goalTitle}>Objectif du jour :</Text>
+    <Text style={styles.goalText}>
+      {dailyGoal.label} <Text style={{ fontWeight: "bold" }}>{dailyGoal.target} {dailyGoal.unit}</Text>
+    </Text>
+    <Text
+      style={[
+        styles.goalStatus,
+        dailyGoal.completed ? styles.goalSuccess : styles.goalFail,
+      ]}
+    >
+      {dailyGoal.completed ? "✅ Objectif atteint !" : "❌ Pas encore atteint"}
+    </Text>
   </View>
 )}
+
 
     </ScrollView>
   );

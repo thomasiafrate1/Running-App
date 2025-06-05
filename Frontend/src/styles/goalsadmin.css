@@ -1,0 +1,75 @@
+/* Conteneur général */
+.goal-template-container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+  color: #fdd835;
+  background-color: #1c1c1c;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* Titres */
+.goal-template-container h2,
+.goal-template-container h3 {
+  text-align: center;
+  color: #fdd835;
+  margin-bottom: 1.5rem;
+}
+
+/* Formulaire */
+.goal-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.goal-form input,
+.goal-form select {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #2c2c2c;
+  color: #fdd835;
+  min-width: 120px;
+}
+
+.goal-form button {
+  background-color: #fdd835;
+  color: #1c1c1c;
+  border: none;
+  padding: 10px 16px;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.goal-form button:hover {
+  transform: scale(1.05);
+}
+
+/* Liste des templates */
+.goal-template-list {
+  list-style: none;
+  padding: 0;
+  border-top: 1px solid #444;
+  margin-top: 1rem;
+}
+
+.goal-template-list li {
+  background-color: #2c2c2c;
+  border-left: 4px solid #fdd835;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  color: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.goal-template-list li:hover {
+  background-color: #333;
+}

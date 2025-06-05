@@ -15,12 +15,22 @@ type Stats = {
   avgSpeed?: number;
 };
 
+type Goal = {
+  id: number;
+  label: string;
+  completed: boolean;
+  date: string;
+};
+
+
+
+
 
 export default function ProfileScreen() {
   const [user, setUser] = useState<{ id: number; email: string; username: string; profile_picture: string | null } | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const router = useRouter();
-  const [goalHistory, setGoalHistory] = useState([]);
+  const [goalHistory, setGoalHistory] = useState<Goal[]>([]);
 
 
   const updateProfilePicture = async (base64Image: string) => {
@@ -78,7 +88,12 @@ useEffect(() => {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await res.json();
+if (Array.isArray(data)) {
   setGoalHistory(data);
+} else {
+  console.warn("⛔ Mauvaise réponse reçue :", data);
+}
+
   };
 
 
@@ -129,6 +144,7 @@ useEffect(() => {
       };
 
       fetchUser();
+      fetchGoalHistory();
 
       fetchStats();
 
@@ -210,8 +226,9 @@ useEffect(() => {
         <View style={styles.goalSection}>
           <Text style={styles.subTitle}>Objectifs Accomplis</Text>
           <Text style={styles.goalSummary}>
-            {goalHistory.filter(g => g.completed).length} 
+            {goalHistory?.filter((g) => g.completed).length ?? 0}
           </Text>
+
         </View>
       </>
     )}

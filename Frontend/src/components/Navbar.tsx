@@ -35,6 +35,11 @@ export default function Navbar() {
 </NavLink>
 
         </li>
+        <li>
+          <NavLink to="/goals" className={({ isActive }) => isActive ? "active" : ""}>
+  Goals
+</NavLink>
+        </li>
       </ul>
     </nav>
   );

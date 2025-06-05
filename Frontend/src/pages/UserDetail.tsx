@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/NavBar";
-import "../styles/style.css"
+import "../styles/userdetail.css"
 
 export default function UserDetail() {
   const { id } = useParams();

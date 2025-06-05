@@ -72,16 +72,22 @@ exports.deleteCourse = (req, res) => {
   );
 };
 
-// GET /courses/all
 exports.getAllCourses = (req, res) => {
   db.query(
-    "SELECT * FROM courses ORDER BY start_time DESC",
+    "SELECT c.*, u.email FROM courses c JOIN users u ON c.user_id = u.id ORDER BY start_time DESC",
     (err, results) => {
       if (err) return res.status(500).json({ message: "Erreur serveur", err });
-      res.json(results);
+
+      const formatted = results.map(course => ({
+        ...course,
+        path: course.path ? JSON.parse(course.path) : null,
+      }));
+
+      res.json(formatted);
     }
   );
 };
+
 
 
 // GET /courses/user/:id

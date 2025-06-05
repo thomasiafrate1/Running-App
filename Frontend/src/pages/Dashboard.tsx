@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/NavBar";
-import "../styles/style.css";
+import "../styles/dashboard.css";
 
 type Stats = {
   totalUsers: number;
@@ -58,34 +58,35 @@ export default function Dashboard() {
 
 
   return (
-    
+    <>
+<Navbar />
     <div className="dashboard-container">
-      <Navbar />
-      <h1>📊 Tableau de bord admin</h1>
+      
+      <h1> Tableau de bord admin</h1>
 
       {error && <p className="error">{error}</p>}
 
       {stats ? (
         <>
           <div className="stats-grid">
-            <div className="stat-card">👥 Utilisateurs : {stats.totalUsers}</div>
-            <div className="stat-card">🏃‍♂️ Courses : {stats.totalCourses}</div>
+            <div className="stat-card"> Utilisateurs : {stats.totalUsers}</div>
+            <div className="stat-card"> Courses : {stats.totalCourses}</div>
             <div className="stat-card">
-              📏 Distance moyenne : {stats.avgDistance.toFixed(2)} km
+               Distance moyenne : {stats.avgDistance.toFixed(2)} km
             </div>
             <div className="stat-card">
-              ⏱ Durée moyenne : {Math.round(stats.avgDuration / 60)} min
+               Durée moyenne : {Math.round(stats.avgDuration / 60)} min
             </div>
             <div className="stat-card">
-              🎯 Objectifs atteints : {stats.completedGoals} / {stats.totalGoals}
+               Objectifs atteints : {stats.completedGoals} / {stats.totalGoals}
             </div>
             <div className="stat-card">
-              📈 Taux de réussite : {stats.successRate}%
+               Taux de réussite : {stats.successRate}%
             </div>
           </div>
 
           <div className="top-users">
-            <h3>🔥 Top utilisateurs</h3>
+            <h3> Top utilisateurs</h3>
             <ul>
               {topUsers.map((u, i) => (
                 <li key={i}>
@@ -99,5 +100,7 @@ export default function Dashboard() {
         <p>Chargement...</p>
       )}
     </div>
+    </>
+    
   );
 }

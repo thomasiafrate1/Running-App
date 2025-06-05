@@ -7,6 +7,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const adminGoalsRoutes = require("./routes/adminGoals");
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +17,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/goals", require("./routes/goals"));
 app.use("/api/admin", require("./routes/admin"));
 app.use("/api/notifications", require("./routes/notifications"));
+app.use("/api/admin/goals", adminGoalsRoutes);
+
 
 
 

@@ -322,7 +322,7 @@ return (
       }}
     >
       {/* Trajet effectué */}
-      <Polyline coordinates={path} strokeColor="blue" strokeWidth={4} />
+      <Polyline coordinates={path} strokeColor="#f6b500" strokeWidth={4} />
 
       {/* Trait A ➝ B si en mode objectif */}
       {goalMode && targetPoint && location && (

@@ -14,7 +14,7 @@ export default function TabLayout() {
             case "run":
               return "Course";
             case "notifications":
-              return "Notifications";
+              return "Notif";
             case "profile":
               return "Profil";
             default:

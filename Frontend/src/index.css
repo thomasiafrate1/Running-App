@@ -10,3 +10,8 @@ body {
   margin: auto;
   padding: 20px;
 }
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}

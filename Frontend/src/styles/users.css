@@ -1,0 +1,102 @@
+/* ===== USERS PAGE MODERN STYLING ===== */
+
+body {
+  background-color: #1c1c1c;
+  color: #fdd835;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.page {
+  padding: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #fdd835;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #2c2c2c;
+  border: 2px solid #fdd835;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.user-table th,
+.user-table td {
+  padding: 16px 20px;
+  text-align: left;
+  border-bottom: 1px solid #444;
+  font-size: 15px;
+  color: white;
+}
+
+.user-table th {
+  background-color: #1c1c1c;
+  color: #fdd835;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.user-table tr:hover {
+  background-color: #333;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+  color: white;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+  opacity: 0.95;
+}
+
+.btn-secondary {
+  background-color: #424242;
+  color: #fdd835;
+  border: 1px solid #fdd835;
+}
+
+.btn-danger {
+  background-color: #c62828;
+}
+
+.btn-view {
+  background-color: #0277bd;
+}
+
+.btn-edit {
+  background-color: #2e7d32;
+}
+
+.error {
+  color: #e53935;
+  background-color: #2c2c2c;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 20px;
+  border: 1px solid #e53935;
+}

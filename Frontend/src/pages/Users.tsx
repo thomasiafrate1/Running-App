@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/NavBar";
+import "../styles/users.css"
 
 type User = {
   id: number;
@@ -65,8 +66,10 @@ const toggleRole = async (id: number, currentRole: string) => {
   }, []);
 
   return (
+    <>
+    <Navbar />
     <div className="page">
-      <Navbar />
+      
       <h2 className="page-title">👥 Gestion des utilisateurs</h2>
       {error && <p className="error">{error}</p>}
 
@@ -87,22 +90,22 @@ const toggleRole = async (id: number, currentRole: string) => {
               <td>{u.role}</td>
               <td className="actions">
                 <button onClick={() => toggleRole(u.id, u.role)} className="btn btn-secondary">
-                  🎭 Rôle
+                   Rôle
                 </button>
                 <button onClick={() => handleDelete(u.id)} className="btn btn-danger">
-                  🗑️ Supprimer
+                   Supprimer
                 </button>
                 <button
                   onClick={() => navigate(`/users/${u.id}/courses`)}
                   className="btn btn-view"
                 >
-                  📂 Courses
+                   Courses
                 </button>
                 <button
     onClick={() => navigate(`/users/${u.id}`)}
     className="btn btn-edit"
   >
-    ✏️ Modifier
+     Modifier
   </button>
               </td>
             </tr>
@@ -110,5 +113,7 @@ const toggleRole = async (id: number, currentRole: string) => {
         </tbody>
       </table>
     </div>
+    </>
+    
   );
 }
