@@ -22,7 +22,7 @@ exports.getOrCreateDailyGoal = (req, res) => {
       } else {
         // Pas encore d'objectif : tirer aléatoirement
         db.query(
-          "SELECT * FROM goals_template WHERE active = 1 ORDER BY RAND() LIMIT 1",
+          "SELECT * FROM goal_templates WHERE active = 1 ORDER BY RAND() LIMIT 1",
           (err, templateResults) => {
             if (err || templateResults.length === 0) {
               return res.status(500).json({ message: "Aucun objectif disponible", err });

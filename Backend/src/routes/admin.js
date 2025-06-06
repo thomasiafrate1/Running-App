@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { loginAdmin , getAllCourses, getLoginHistory ,getOneUser,updateUser, getStats,getAdminStats, getTopUsers, getAllUsers, getUserCourses, updateUserRole, deleteUser  } = require("../controllers/authController");
+const { loginAdmin , getAllCourses, getLoginHistory ,getOneUser,updateUser, getStats,getAdminStats, getTopUsers, getAllUsers, getUserCourses, updateUserRole, deleteUser } = require("../controllers/authController");
 const authMiddleware = require("../middlewares/authMiddleware");
+const {getNotifications,
+  createNotification,
+  deleteNotification,
+  updateNotification} = require("../controllers/notificationsController")
 
 router.post("/login", loginAdmin);
 router.get("/stats", getStats);
@@ -15,6 +19,11 @@ router.get("/top-users", authMiddleware, getTopUsers);
 router.put("/users/:id", authMiddleware, updateUser);
 router.get("/users/:id", authMiddleware, getOneUser);
 router.get("/logins", authMiddleware, getLoginHistory);
+router.get("/notifications", authMiddleware, getNotifications);
+router.post("/notifications", authMiddleware, createNotification);
+router.delete("/notifications/:id", authMiddleware, deleteNotification);
+// (optionnel) pour modifier une notification existante :
+router.put("/notifications/:id", authMiddleware, updateNotification);
 
 
 

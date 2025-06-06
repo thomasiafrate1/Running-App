@@ -36,7 +36,13 @@ export default function AllCourses() {
         setError(data.message || "Erreur de chargement");
         return;
       }
-      setCourses(data);
+      const cleanedCourses = data.map((course: any) => ({
+  ...course,
+  path: typeof course.path === "string" ? JSON.parse(course.path) : course.path
+}));
+
+setCourses(cleanedCourses);
+
     };
 
     fetchCourses();
@@ -46,17 +52,17 @@ export default function AllCourses() {
     <>
       <Navbar />
       <div className="all-courses">
-        <h2>📍 Toutes les courses</h2>
+        <h2> Toutes les courses</h2>
         {error && <p className="error">{error}</p>}
         <ul>
           {courses.map((course) => (
             <div key={course.id} className="course-card">
-              <p>👤 {course.email}</p>
-              <p>📅 {new Date(course.start_time).toLocaleString()}</p>
-              <p>📏 Distance : {course.distance.toFixed(2)} km</p>
-              <p>⏱ Durée : {Math.round(course.duration / 60)} min</p>
+              <p> {course.email}</p>
+              <p> {new Date(course.start_time).toLocaleString()}</p>
+              <p> Distance : {course.distance.toFixed(2)} km</p>
+              <p> Durée : {Math.round(course.duration / 60)} min</p>
               <p>
-                🚀 Vitesse moyenne :{" "}
+                 Vitesse moyenne :{" "}
                 {typeof course.avg_speed === "number"
                   ? `${course.avg_speed.toFixed(2)} km/h`
                   : "N/A"}
@@ -64,7 +70,9 @@ export default function AllCourses() {
 
               {course.path && course.path.length > 0 && (
                 <MapContainer
-                  center={[course.path[0].latitude, course.path[0].longitude] as [number, number]}
+                  center={
+                    [course.path[0].latitude, course.path[0].longitude] as L.LatLngExpression
+                  }
                   zoom={16}
                   scrollWheelZoom={false}
                   style={{ height: "200px", marginTop: "1rem", borderRadius: "8px" }}

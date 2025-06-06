@@ -119,6 +119,8 @@ useFocusEffect(
         const statsData = await resStats.json();
         const courses = await resCourses.json();
         const goalData = await resGoal.json();
+        console.log("🎯 Objectif reçu :", goalData);
+
 
         setStats(statsData);
 
@@ -155,7 +157,7 @@ useFocusEffect(
   {" "}
   {typeof stats.totalDistance === "number"
     ? `${stats.totalDistance.toFixed(2)} km`
-    : "Distance inconnue"}{" "}
+    : "Distance inconnue"}{""}
   
 </Text>
 
@@ -193,7 +195,7 @@ useFocusEffect(
             )}
           </>
         ) : (
-          <Text>Pas encore de course enregistrée</Text>
+          <Text style={styles.goalText}>Pas encore de course enregistrée</Text>
         )}
       </View>
       {dailyGoal && (

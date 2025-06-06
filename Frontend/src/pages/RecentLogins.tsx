@@ -37,14 +37,14 @@ export default function RecentLogins() {
     <Navbar/>
      <div className="recent-logins">
         
-      <h2>🕵️ Activité récente</h2>
+      <h2>Activité récente</h2>
       {error && <p className="error">{error}</p>}
       <ul>
         {logins.map((login) => (
           <li key={login.id} className="login-entry">
-            <p>👤 {login.email}</p>
-            <p>📍 IP : {login.ip_address}</p>
-            <p>🕒 {new Date(login.created_at).toLocaleString()}</p>
+            <p>{login.email}</p>
+            <p>IP : {login.ip_address}</p>
+            <p>{new Date(login.created_at).toLocaleString()}</p>
           </li>
         ))}
       </ul>

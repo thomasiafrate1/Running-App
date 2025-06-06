@@ -5,7 +5,7 @@ import "../styles/navbar.css";
 export default function Navbar() {
   return (
     <nav className="navbar">
-      <div className="navbar-logo">🏃‍♂️ Admin Panel</div>
+      <div className="navbar-logo">Run Ynov Admin</div>
       <ul className="navbar-links">
         <li>
             <NavLink
@@ -38,6 +38,11 @@ export default function Navbar() {
         <li>
           <NavLink to="/goals" className={({ isActive }) => isActive ? "active" : ""}>
   Goals
+</NavLink>
+        </li>
+        <li>
+          <NavLink to="/notifications" className={({ isActive }) => isActive ? "active" : ""}>
+  Notifications
 </NavLink>
         </li>
       </ul>

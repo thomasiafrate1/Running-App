@@ -1,0 +1,90 @@
+.page-container {
+  padding: 3rem;
+  background-color: #1c1c1c;
+  min-height: 100vh;
+  color: #f5f5f5;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+h2 {
+  color: #fdd835;
+  margin-bottom: 2rem;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notification-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 2.5rem;
+}
+
+.notification-form input {
+  background-color: #2c2c2c;
+  border: 1px solid #555;
+  padding: 10px 15px;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.notification-form button {
+  background-color: #fdd835;
+  color: black;
+  font-weight: bold;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.notification-form button:hover {
+  background-color: #e6c200;
+}
+
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.notification-item {
+  background-color: #2c2c2c;
+  padding: 1.5rem;
+  border-radius: 8px;
+  position: relative;
+  border-left: 5px solid #fdd835;
+}
+
+.notification-item h4 {
+  font-size: 18px;
+  color: #fdd835;
+  margin-bottom: 6px;
+}
+
+.notification-item p {
+  font-style: italic;
+  color: #ccc;
+  margin-bottom: 10px;
+}
+
+.notification-item button {
+  background-color: #e53935;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.notification-item button:hover {
+  background-color: #c62828;
+}

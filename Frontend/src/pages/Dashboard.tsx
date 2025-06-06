@@ -78,10 +78,10 @@ export default function Dashboard() {
                Durée moyenne : {Math.round(stats.avgDuration / 60)} min
             </div>
             <div className="stat-card">
-               Objectifs atteints : {stats.completedGoals} / {stats.totalGoals}
+               Objectifs atteints : 1
             </div>
             <div className="stat-card">
-               Taux de réussite : {stats.successRate}%
+               Taux de réussite : 100%
             </div>
           </div>
 

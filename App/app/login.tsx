@@ -6,10 +6,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Image
 } from "react-native";
 import { useRouter } from "expo-router";
 import { login } from "../services/authService";
 import { saveToken } from "../utils/token";
+import "../assets/images/logoRunYnov.png"
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -29,6 +31,12 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
+      <Image
+  source={require("../assets/images/logoRunYnov.png")}
+  style={{ width: 120, height: 120, marginBottom: 20 }}
+  resizeMode="contain"
+/>
+
       <Text style={styles.title}>Se connecter</Text>
       <TextInput
         style={styles.input}

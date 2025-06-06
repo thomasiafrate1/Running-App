@@ -1,3 +1,5 @@
+// app/(tabs)/_layout.tsx
+
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -5,6 +7,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={({ route }) => ({
+        headerShown: false, // ⛔ Supprime le header en haut pour tous les tabs
+
         tabBarLabel: (() => {
           switch (route.name) {
             case "index":
@@ -21,9 +25,9 @@ export default function TabLayout() {
               return "Onglet";
           }
         })(),
+
         tabBarIcon: ({ color, size }) => {
           let iconName: string;
-
           switch (route.name) {
             case "index":
               iconName = "home";
@@ -43,9 +47,9 @@ export default function TabLayout() {
             default:
               iconName = "ellipse";
           }
-
           return <Ionicons name={iconName as any} size={size} color={color} />;
         },
+
         tabBarActiveTintColor: "#fdd835",
         tabBarInactiveTintColor: "#999",
         tabBarStyle: {
@@ -60,7 +64,6 @@ export default function TabLayout() {
           fontSize: 12,
           fontWeight: "bold",
         },
-        headerShown: false,
       })}
     >
       <Tabs.Screen name="index" />

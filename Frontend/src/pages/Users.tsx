@@ -70,7 +70,7 @@ const toggleRole = async (id: number, currentRole: string) => {
     <Navbar />
     <div className="page">
       
-      <h2 className="page-title">👥 Gestion des utilisateurs</h2>
+      <h2 className="page-title">Gestion des utilisateurs</h2>
       {error && <p className="error">{error}</p>}
 
       <table className="user-table">

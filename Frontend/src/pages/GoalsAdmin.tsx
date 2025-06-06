@@ -27,7 +27,7 @@ export default function GoalTemplateAdmin() {
     });
 
     if (res.ok) {
-      alert("🎯 Objectif ajouté !");
+      alert("Objectif ajouté !");
       fetchTemplates();
     } else {
       alert("Erreur lors de l’ajout");
@@ -42,7 +42,7 @@ export default function GoalTemplateAdmin() {
     <>
     <Navbar/>
      <div className="goal-template-container">
-  <h2>Créer un modèle d'objectif</h2>
+  <h2>Créer un objectif</h2>
 
   <div className="goal-form">
     <input

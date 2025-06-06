@@ -7,6 +7,7 @@ import UserDetail from "./pages/UserDetail";
 import AllCourses from "./pages/AllCourses";
 import GoalTemplateAdmin from "./pages/GoalsAdmin";
 import RecentLogins from "./pages/RecentLogins";
+import AdminNotifications from "./pages/Notifications";
 
 
 
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/courses" element={<AllCourses />} />
         <Route path="/logins" element={<RecentLogins />} />
         <Route path="/goals" element={<GoalTemplateAdmin />} />
+        <Route path="/notifications" element={<AdminNotifications />} />
 
       </Routes>
     </BrowserRouter>
