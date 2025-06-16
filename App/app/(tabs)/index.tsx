@@ -106,13 +106,13 @@ useFocusEffect(
       const token = await getToken();
 
       try {
-        const resStats = await fetch(`http://10.188.218.47:3000/api/courses/stats`, {
+        const resStats = await fetch(`http://192.168.1.42:3000/api/courses/stats`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const resCourses = await fetch(`http://10.188.218.47:3000/api/courses`, {
+        const resCourses = await fetch(`http://192.168.1.42:3000/api/courses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const resGoal = await fetch(`http://10.188.218.47:3000/api/goals/daily`, {
+        const resGoal = await fetch(`http://192.168.1.42:3000/api/goals/daily`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -147,7 +147,6 @@ useFocusEffect(
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Tableau de bord</Text>
-
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Mes statistiques</Text>
         {stats ? (
@@ -158,7 +157,6 @@ useFocusEffect(
   {typeof stats.totalDistance === "number"
     ? `${stats.totalDistance.toFixed(2)} km`
     : "Distance inconnue"}{""}
-  
 </Text>
 
             <Text style={styles.text}>Durée total : {Math.round(stats.totalDuration / 60)} min</Text>

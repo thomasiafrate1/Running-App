@@ -1,24 +1,39 @@
 const db = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const QRCode = require("qrcode");
+const { sendVerificationEmail } = require("../services/mailServices");
 
-exports.registerUser = (req, res) => {
+exports.registerUser = async (req, res) => {
   const { email, password, username, profile_picture } = req.body;
 
   if (!email || !password || !username)
     return res.status(400).json({ message: "Champs requis" });
 
   const hashedPassword = bcrypt.hashSync(password, 10);
+  const token = crypto.randomBytes(32).toString("hex");
 
   db.query(
-    "INSERT INTO users (email, password, username, profile_picture) VALUES (?, ?, ?, ?)",
-    [email, hashedPassword, username, profile_picture || null],
-    (err, result) => {
+    "INSERT INTO users (email, password, username, profile_picture, email_verification_token) VALUES (?, ?, ?, ?, ?)",
+    [email, hashedPassword, username, profile_picture || null, token],
+    async (err, result) => {
       if (err) {
         console.error("Erreur lors de l'inscription :", err);
         return res.status(500).json({ message: "Erreur serveur", err });
       }
-      res.status(201).json({ message: "Utilisateur inscrit" });
+
+      const verifyUrl = `http://localhost:3000/api/auth/verify-email?token=${token}`;
+      const qrCodeDataUrl = await QRCode.toDataURL(verifyUrl);
+
+      try {
+        await sendVerificationEmail(email, username, qrCodeDataUrl, verifyUrl);
+
+      } catch (e) {
+        console.error("Erreur envoi mail :", e);
+      }
+
+      res.status(201).json({ message: "Utilisateur inscrit. Vérifiez votre email." });
     }
   );
 };
@@ -38,6 +53,11 @@ exports.loginUser = (req, res) => {
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: "24h",
     });
+
+    if (!user.verified) {
+  return res.status(403).json({ message: "Veuillez vérifier votre email avant de vous connecter." });
+}
+
 
     res.json({
   message: "Connexion réussie",
@@ -312,4 +332,34 @@ exports.getLoginHistory = (req, res) => {
     if (err) return res.status(500).json({ message: "Erreur serveur" });
     res.json(results);
   });
+};
+
+
+exports.verifyEmail = (req, res) => {
+  const { token } = req.query;
+
+  if (!token) {
+    return res.status(400).send("Lien invalide.");
+  }
+
+  db.query(
+    "SELECT * FROM users WHERE email_verification_token = ?",
+    [token],
+    (err, results) => {
+      if (err || results.length === 0) {
+        return res.status(400).send("Token invalide ou expiré.");
+      }
+
+      const user = results[0];
+
+      db.query(
+        "UPDATE users SET verified = true, email_verification_token = NULL WHERE id = ?",
+        [user.id],
+        (err) => {
+          if (err) return res.status(500).send("Erreur serveur.");
+          res.send("✅ Email vérifié ! Vous pouvez maintenant vous connecter.");
+        }
+      );
+    }
+  );
 };
