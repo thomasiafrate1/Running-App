@@ -363,3 +363,4 @@ exports.verifyEmail = (req, res) => {
     }
   );
 };
+

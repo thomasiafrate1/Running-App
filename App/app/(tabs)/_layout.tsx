@@ -17,6 +17,8 @@ export default function TabLayout() {
               return "Historique";
             case "run":
               return "Course";
+            case "leaderboard":
+              return "Classement";
             case "notifications":
               return "Notif";
             case "profile":
@@ -37,6 +39,9 @@ export default function TabLayout() {
               break;
             case "history":
               iconName = "time";
+              break;
+            case "leaderboard":
+              iconName = "trophy";
               break;
             case "notifications":
               iconName = "notifications";

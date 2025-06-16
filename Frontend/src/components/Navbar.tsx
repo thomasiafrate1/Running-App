@@ -23,6 +23,14 @@ export default function Navbar() {
             Utilisateurs
           </NavLink>
         </li>
+                <li>
+            <NavLink
+            to="/leaderboard"
+            className={({ isActive }) => (isActive ? "active" : "")}
+            >
+            Classement
+          </NavLink>
+        </li>
         <li>
             <NavLink to="/courses" className={({ isActive }) => (isActive ? "active" : "")}>
   Toutes les courses

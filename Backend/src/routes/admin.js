@@ -6,6 +6,7 @@ const {getNotifications,
   createNotification,
   deleteNotification,
   updateNotification} = require("../controllers/notificationsController")
+  const { getLeaderboard } = require("../controllers/leaderboardController");
 
 router.post("/login", loginAdmin);
 router.get("/stats", getStats);
@@ -22,8 +23,9 @@ router.get("/logins", authMiddleware, getLoginHistory);
 router.get("/notifications", authMiddleware, getNotifications);
 router.post("/notifications", authMiddleware, createNotification);
 router.delete("/notifications/:id", authMiddleware, deleteNotification);
-// (optionnel) pour modifier une notification existante :
 router.put("/notifications/:id", authMiddleware, updateNotification);
+router.get("/leaderboard", authMiddleware, getLeaderboard);
+
 
 
 

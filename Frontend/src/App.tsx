@@ -8,6 +8,7 @@ import AllCourses from "./pages/AllCourses";
 import GoalTemplateAdmin from "./pages/GoalsAdmin";
 import RecentLogins from "./pages/RecentLogins";
 import AdminNotifications from "./pages/Notifications";
+import LeaderboardAdmin from "./pages/LeaderboardAdmin";
 
 
 
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/logins" element={<RecentLogins />} />
         <Route path="/goals" element={<GoalTemplateAdmin />} />
         <Route path="/notifications" element={<AdminNotifications />} />
+        <Route path="/leaderboard" element={<LeaderboardAdmin />} />
 
       </Routes>
     </BrowserRouter>

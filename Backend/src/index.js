@@ -18,9 +18,7 @@ app.use("/api/goals", require("./routes/goals"));
 app.use("/api/admin", require("./routes/admin"));
 app.use("/api/notifications", require("./routes/notifications"));
 app.use("/api/admin/goals", adminGoalsRoutes);
-
-
-
+app.use("/api/leaderboard", require("./routes/leaderboard"));
 
 
 
