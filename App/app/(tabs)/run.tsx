@@ -4,7 +4,7 @@ import * as Location from "expo-location";
 import MapView, { Polyline } from "react-native-maps";
 import { getToken } from "../../utils/token";
 import * as Notifications from "expo-notifications";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -41,6 +41,10 @@ const [speed, setSpeed] = useState(0);
 const [paused, setPaused] = useState(false);
 const [goalMode, setGoalMode] = useState(false); // mode objectif
 const [targetPoint, setTargetPoint] = useState<{ latitude: number; longitude: number } | null>(null); // point d'arrivée
+const { challengePath } = useLocalSearchParams();
+const challengeCoords = challengePath ? JSON.parse(challengePath as string) : null;
+
+
 
   const darkMapStyle = [
   {
@@ -323,6 +327,14 @@ return (
     >
       {/* Trajet effectué */}
       <Polyline coordinates={path} strokeColor="#f6b500" strokeWidth={4} />
+      {challengeCoords && (
+  <Polyline
+    coordinates={challengeCoords}
+    strokeColor="#999"  // gris
+    strokeWidth={3}
+    lineDashPattern={[4, 6]} // pointillés pour différencier
+  />
+)}
 
       {/* Trait A ➝ B si en mode objectif */}
       {goalMode && targetPoint && location && (

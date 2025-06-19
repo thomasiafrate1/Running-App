@@ -1,24 +1,41 @@
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  Modal,
+} from "react-native";
 import MapView, { Polyline } from "react-native-maps";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { getToken } from "../../utils/token";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { Image } from "react-native";
+import { useAuth } from "../../hooks/useAuth";
 
 
 
 type Course = {
   id: number;
+  user_id: number;
   distance: number;
   duration: number;
   start_time: string;
   path?: string;
   email?: string;
-   profile_picture?: string; // ✅ AJOUTE CECI
+  profile_picture?: string;
   avg_speed?: number;
+};
 
+type Comment = {
+  username: string;
+  content: string;
+  created_at: string;
 };
 
 const darkMapStyle = [
@@ -83,7 +100,6 @@ const darkMapStyle = [
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
-
   const min = Math.floor(seconds / 60);
   const sec = seconds % 60;
   return `${min}min ${sec}s`;
@@ -93,39 +109,110 @@ function formatDuration(seconds: number): string {
 export default function HistoryDetailScreen() {
     
   const { id, public: isPublic } = useLocalSearchParams();
+  const router = useRouter();
+  const { user } = useAuth();
   const [course, setCourse] = useState<Course | null>(null);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [showModal, setShowModal] = useState(false);
+
+
+
+useEffect(() => {
+  console.log("👤 Utilisateur connecté :", user);
+}, [user]);
+
 
 
   useEffect(() => {
-    const fetchCourse = async () => {
+        const fetchCourse = async () => {
       const token = await getToken();
       const url = isPublic
-      ? `http://192.168.1.42:3000/api/courses/public/${id}`
-      : `http://192.168.1.42:3000/api/courses/${id}`;
+        ? `http://192.168.1.42:3000/api/courses/public/${id}`
+        : `http://192.168.1.42:3000/api/courses/${id}`;
       const res = await fetch(url, {
-      headers: isPublic ? {} : { Authorization: `Bearer ${token}` },
+        headers: isPublic ? {} : { Authorization: `Bearer ${token}` },
       });
-
       const data = await res.json();
       setCourse(data);
-
       if (data.path) {
         try {
-          const parsed = JSON.parse(data.path);
-          setPath(parsed);
+          setPath(JSON.parse(data.path));
         } catch (e) {
           console.warn("Erreur parsing path:", e);
         }
       }
-
       setLoading(false);
+      fetchLikes();
+      fetchComments();
     };
-
     fetchCourse();
   }, [id]);
+
+  const fetchLikes = async () => {
+  const token = await getToken();
+  const res = await fetch(`http://192.168.1.42:3000/api/interactions/${id}/likes`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = await res.json();
+  console.log("🔁 Likes fetched:", data);
+  setLikeCount(data.count);
+  setLiked(data.liked);
+};
+
+
+const fetchComments = async () => {
+  const res = await fetch(`http://192.168.1.42:3000/api/interactions/${id}/comments`);
+  const data = await res.json();
+  console.log("🧾 Commentaires récupérés :", data);
+  setComments(data);
+};
+
+
+
+const handleLike = async () => {
+  const token = await getToken();
+  console.log("❤️ Toggle like...");
+  await fetch(`http://192.168.1.42:3000/api/interactions/${id}/like`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  await fetchLikes(); // très important
+};
+
+
+const handleAddComment = async () => {
+  if (!newComment.trim()) return;
+
+  const token = await getToken();
+  console.log("💬 Envoi commentaire :", newComment);
+
+  const res = await fetch(`http://192.168.1.42:3000/api/interactions/${id}/comments`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ content: newComment }),
+  });
+
+  const result = await res.json();
+  console.log("🧾 Réponse commentaire :", result);
+
+  setNewComment("");
+  fetchComments(); // rafraîchir la liste
+};
+
+
 
   if (loading || !course) {
     return (
@@ -136,15 +223,21 @@ export default function HistoryDetailScreen() {
     );
   }
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
+return (
+  <KeyboardAvoidingView
+    behavior={Platform.OS === "ios" ? "padding" : undefined}
+    style={{ flex: 1, backgroundColor: "#1c1c1c" }}
+  >
+    <ScrollView
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.header}>
-  <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-    <Ionicons name="arrow-back" size={24} color="#fdd835" />
-  </TouchableOpacity>
-  <Text style={styles.title}>     Détails de la course</Text>
-</View>
-
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#fdd835" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Détails de la course</Text>
+      </View>
 
       {path.length > 0 ? (
         <MapView
@@ -164,47 +257,144 @@ export default function HistoryDetailScreen() {
           <Text>Pas de trace GPS</Text>
         </View>
       )}
-      {course.profile_picture ? (
-  <View style={{ alignItems: "center", marginBottom: 10 }}>
-    <Image
-      source={{ uri: course.profile_picture }}
-      style={{
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        borderWidth: 2,
-        borderColor: "#fdd835",
-        marginBottom: 10,
-      }}
-    />
-  </View>
-) : null}
 
-        {course.email && (
-    <Text style={styles.infoText}>{course.email}</Text>
-  )}
+      {course.profile_picture && (
+        <View style={{ alignItems: "center", marginBottom: 10 }}>
+          <Image
+            source={{ uri: course.profile_picture }}
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 40,
+              borderWidth: 2,
+              borderColor: "#fdd835",
+              marginBottom: 10,
+            }}
+          />
+        </View>
+      )}
+
+      {course.email && <Text style={styles.infoText}>{course.email}</Text>}
+
       <View style={styles.info}>
         <Text style={styles.infoBox}>{course.distance.toFixed(2)} km</Text>
         <Text style={styles.infoBox}>{formatDuration(course.duration)}</Text>
-  
+      </View>
 
-</View>
-  <View style={styles.info}>
-    <Text style={styles.infoBox}>{new Date(course.start_time).toLocaleString()}</Text>
-  {course.avg_speed != null && (
-    <Text style={styles.infoBox}>{course.avg_speed.toFixed(2)} km/h</Text>
-  )}
+      <View style={styles.info}>
+        <Text style={styles.infoBox}>{new Date(course.start_time).toLocaleString()}</Text>
+        {course.avg_speed != null && (
+          <Text style={styles.infoBox}>{course.avg_speed.toFixed(2)} km/h</Text>
+        )}
+      </View>
+
+      {/* ❤️ Likes */}
+      <TouchableOpacity
+        onPress={handleLike}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          marginVertical: 12,
+        }}
+      >
+        <Ionicons
+          name={liked ? "heart" : "heart-outline"}
+          size={28}
+          color={liked ? "red" : "#fdd835"}
+        />
+        <Text style={{ color: "white", marginLeft: 10 }}>{likeCount} j’aime</Text>
+      </TouchableOpacity>
+
+      {/* 🚀 Mode Défi (si c'est sa propre course) */}
+        {user?.id === course.user_id && (
+          <TouchableOpacity
+            style={{ backgroundColor: "#fdd835", padding: 12, borderRadius: 10, alignItems: "center", marginBottom: 20 }}
+            onPress={() => setShowModal(true)}
+          >
+            <Text style={{ fontWeight: "bold" }}>🎯 Refaire cette course en mode défi</Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Modal */}
+        <Modal visible={showModal} transparent animationType="slide">
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.7)" }}>
+            <View style={{ backgroundColor: "white", padding: 20, borderRadius: 10, width: "80%" }}>
+              <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 15 }}>
+                Voulez-vous lancer cette course en mode défi ?
+              </Text>
+              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <TouchableOpacity onPress={() => setShowModal(false)}>
+                  <Text style={{ color: "red", fontWeight: "bold" }}>Annuler</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowModal(false);
+                    router.push({ pathname: "/run", params: { challengePath: JSON.stringify(path) } });
+                  }}
+                >
+                  <Text style={{ color: "green", fontWeight: "bold" }}>Oui, lancer</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+      {/* 💬 Commentaires */}
+      <Text style={[styles.infoText, { fontSize: 20, marginTop: 10 }]}>Commesntaires</Text>
+
+      {comments.map((comment, index) => (
+        <View key={index} style={{ backgroundColor: "#2c2c2c", padding: 10, borderRadius: 8, marginVertical: 5 }}>
+  <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+    <Text style={{ color: "#fdd835", fontWeight: "bold" }}>{comment.username}</Text>
+    <Text style={{ color: "#999", fontSize: 12 }}>{new Date(comment.created_at).toLocaleString()}</Text>
   </View>
+  <Text style={{ color: "white", marginTop: 5 }}>{comment.content}</Text>
+</View>
+
+      ))}
+
+      {/* ➕ Nouveau commentaire */}
+      <View
+        style={{
+          flexDirection: "row",
+          marginTop: 10,
+          alignItems: "center",
+          backgroundColor: "#2c2c2c",
+          paddingHorizontal: 10,
+          borderRadius: 8,
+          marginBottom: 30, // espace pour éviter le bas masqué
+        }}
+      >
+        <TextInput
+          style={{ color: "white", flex: 1, padding: 10 }}
+          placeholder="Ajouter un commentaire"
+          placeholderTextColor="#888"
+          value={newComment}
+          onChangeText={setNewComment}
+        />
+        <TouchableOpacity onPress={handleAddComment}>
+          <Ionicons name="send" size={24} color="#fdd835" />
+        </TouchableOpacity>
+      </View>
     </ScrollView>
-  );
+  </KeyboardAvoidingView>
+);
+
+
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: "#1c1c1c",
-    height : "100%",
-  },
+container: {
+  padding: 20,
+  paddingBottom: 600,
+},
+
+  scroll: {
+  flex: 1,
+  backgroundColor: "#1c1c1c",
+},
+
   center: {
     flex: 1,
     justifyContent: "center",

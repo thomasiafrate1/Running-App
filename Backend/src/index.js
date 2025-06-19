@@ -20,7 +20,8 @@ app.use("/api/notifications", require("./routes/notifications"));
 app.use("/api/admin/goals", adminGoalsRoutes);
 app.use("/api/leaderboard", require("./routes/leaderboard"));
 
-
+const interactionRoutes = require("./routes/interactions");
+app.use("/api/interactions", interactionRoutes);
 
 app.get("/", (req, res) => {
   res.send("API de Running prête !");

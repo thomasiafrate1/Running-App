@@ -32,7 +32,14 @@ exports.getUserCourses = (req, res) => {
   const user_id = req.user.id;
 
   db.query(
-    "SELECT * FROM courses WHERE user_id = ? ORDER BY start_time DESC",
+    `SELECT 
+  c.*, 
+  (SELECT COUNT(*) FROM likes l WHERE l.course_id = c.id) AS likeCount,
+  (SELECT COUNT(*) FROM comments cm WHERE cm.course_id = c.id) AS commentCount
+FROM courses c
+WHERE c.user_id = ?
+ORDER BY c.start_time DESC`,
+
     [user_id],
     (err, results) => {
       if (err) return res.status(500).json({ message: "Erreur serveur", err });
@@ -106,11 +113,17 @@ exports.getCoursesByUserId = (req, res) => {
 // GET /courses/recent
 exports.getRecentCourses = (req, res) => {
   db.query(
-    `SELECT c.*, u.email, u.profile_picture
-     FROM courses c 
-     JOIN users u ON c.user_id = u.id 
-     ORDER BY c.start_time DESC 
-     LIMIT 15`,
+    `SELECT 
+  c.*, 
+  u.email, 
+  u.profile_picture,
+  (SELECT COUNT(*) FROM likes l WHERE l.course_id = c.id) AS likeCount,
+  (SELECT COUNT(*) FROM comments cm WHERE cm.course_id = c.id) AS commentCount
+FROM courses c 
+JOIN users u ON c.user_id = u.id 
+ORDER BY c.start_time DESC 
+LIMIT 15
+`,
     (err, results) => {
       if (err) return res.status(500).json({ message: "Erreur serveur", err });
       res.json(results);

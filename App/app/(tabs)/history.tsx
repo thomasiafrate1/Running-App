@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import MapView, { Polyline } from "react-native-maps";
 import { getToken } from "../../utils/token";
+import { Ionicons } from "@expo/vector-icons";
 
 type PathPoint = { latitude: number; longitude: number };
 
@@ -25,6 +26,9 @@ type Course = {
   start_time: string;
   path?: string;
   avg_speed?: number;
+  likeCount?: number;
+commentCount?: number;
+
 };
 
 const darkMapStyle = [
@@ -211,7 +215,19 @@ export default function HistoryScreen() {
         {item.avg_speed.toFixed(2)} <Text style={{ color: "white" }}>km/h</Text>
       </Text>
     </View>
+    
   )}
+  <View style={styles.row}>
+  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+    <Ionicons name="heart" size={18} color="#fdd835" />
+    <Text style={{ color: "#fff" }}>{item.likeCount || 0}</Text>
+  </View>
+  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+    <Ionicons name="chatbubble-ellipses" size={18} color="#fdd835" />
+    <Text style={{ color: "#fff" }}>{item.commentCount || 0}</Text>
+  </View>
+</View>
+
 
 
     
