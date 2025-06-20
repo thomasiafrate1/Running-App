@@ -7,8 +7,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={({ route }) => ({
-        headerShown: false, // ⛔ Supprime le header en haut pour tous les tabs
-
+        headerShown: false,
         tabBarLabel: (() => {
           switch (route.name) {
             case "index":
@@ -17,17 +16,14 @@ export default function TabLayout() {
               return "Historique";
             case "run":
               return "Course";
-            case "leaderboard":
-              return "Classement";
-            case "notifications":
-              return "Notif";
             case "profile":
               return "Profil";
+            case "menu":
+              return "Menu";
             default:
               return "Onglet";
           }
         })(),
-
         tabBarIcon: ({ color, size }) => {
           let iconName: string;
           switch (route.name) {
@@ -40,21 +36,17 @@ export default function TabLayout() {
             case "history":
               iconName = "time";
               break;
-            case "leaderboard":
-              iconName = "trophy";
-              break;
-            case "notifications":
-              iconName = "notifications";
-              break;
             case "profile":
               iconName = "person";
+              break;
+            case "menu":
+              iconName = "ellipsis-horizontal";
               break;
             default:
               iconName = "ellipse";
           }
           return <Ionicons name={iconName as any} size={size} color={color} />;
         },
-
         tabBarActiveTintColor: "#fdd835",
         tabBarInactiveTintColor: "#999",
         tabBarStyle: {
@@ -74,8 +66,8 @@ export default function TabLayout() {
       <Tabs.Screen name="index" />
       <Tabs.Screen name="history" />
       <Tabs.Screen name="run" />
-      <Tabs.Screen name="notifications" />
       <Tabs.Screen name="profile" />
+      <Tabs.Screen name="menu" />
     </Tabs>
   );
 }

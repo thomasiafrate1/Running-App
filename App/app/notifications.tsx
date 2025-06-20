@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { getToken } from "../../utils/token";
+import { getToken } from "../utils/token";
 
 type Notification = {
   id: number;

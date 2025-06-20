@@ -7,7 +7,7 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
-import { getToken } from "../../utils/token";
+import { getToken } from "../utils/token";
 
 type User = {
   id: number;
@@ -60,7 +60,7 @@ export default function LeaderboardScreen() {
               source={
                 item.profile_picture
                   ? { uri: item.profile_picture }
-                  : require("../../assets/images/logoRunYnov.png")
+                  : require("../assets/images/logoRunYnov.png")
               }
               style={styles.avatar}
             />

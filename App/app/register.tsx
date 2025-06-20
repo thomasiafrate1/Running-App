@@ -18,23 +18,44 @@ export default function Register() {
   const [username, setUsername] = useState("");
 
   const handleRegister = async () => {
-    if (password !== confirmPassword) {
-      Alert.alert("Erreur", "Les mots de passe ne correspondent pas");
-      return;
-    }
+  if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    Alert.alert("Erreur", "Email invalide");
+    return;
+  }
 
-    try {
-      const data = await register(email, password, username);
-      if (data.message === "Utilisateur inscrit") {
-        Alert.alert("Inscription réussie !");
-        router.replace("/login");
-      } else {
-        Alert.alert("Erreur", data.message || "Erreur inconnue");
-      }
-    } catch (error) {
-      Alert.alert("Erreur réseau", "Impossible de contacter le serveur");
+  if (password.length < 8 || !/[A-Z]/.test(password) || !/\d/.test(password)) {
+    Alert.alert(
+      "Mot de passe faible",
+      "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre."
+    );
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    Alert.alert("Erreur", "Les mots de passe ne correspondent pas");
+    return;
+  }
+
+  try {
+    const data = await register(email, password, username);
+
+    if (data.message?.includes("Vérifiez votre email")) {
+      Alert.alert(
+        "Inscription réussie",
+        "Veuillez vérifier votre adresse email. Un lien vous a été envoyé."
+      );
+      router.replace("/login");
+    } else if (data.message === "Utilisateur inscrit") {
+      Alert.alert("Inscription réussie !");
+      router.replace("/login");
+    } else {
+      Alert.alert("Erreur", data.message || "Erreur inconnue");
     }
-  };
+  } catch (error) {
+    Alert.alert("Erreur", "Une erreur est survenue.");
+  }
+};
+
 
   return (
     <View style={styles.container}>
