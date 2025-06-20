@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef  } from "react";
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  Modal,
+  Modal
 } from "react-native";
 import MapView, { Polyline } from "react-native-maps";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -17,6 +17,10 @@ import { getToken } from "../../utils/token";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "react-native";
 import { useAuth } from "../../hooks/useAuth";
+import { captureRef } from "react-native-view-shot";
+import * as MediaLibrary from "expo-media-library";
+import * as Sharing from "expo-sharing";
+import ShareCard from "../../components/ShareCard";
 
 
 
@@ -119,6 +123,7 @@ export default function HistoryDetailScreen() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [showModal, setShowModal] = useState(false);
+  
 
 
 
@@ -211,6 +216,33 @@ const handleAddComment = async () => {
   setNewComment("");
   fetchComments(); // rafraîchir la liste
 };
+
+const shareViewRef = useRef(null);
+
+const handleShare = async () => {
+  const permission = await MediaLibrary.requestPermissionsAsync();
+  if (!permission.granted) {
+    alert("Permission refusée pour accéder à la galerie.");
+    return;
+  }
+
+  try {
+    const uri = await captureRef(shareViewRef, {
+      format: "png",
+      quality: 1,
+    });
+
+    if (await Sharing.isAvailableAsync()) {
+      await Sharing.shareAsync(uri);
+    } else {
+      await MediaLibrary.saveToLibraryAsync(uri);
+      alert("Image enregistrée !");
+    }
+  } catch (err) {
+    console.error("Erreur capture partage :", err);
+  }
+};
+
 
 
 
@@ -377,6 +409,33 @@ return (
           <Ionicons name="send" size={24} color="#fdd835" />
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity
+  onPress={handleShare}
+  style={{
+    backgroundColor: "#fdd835",
+    padding: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    marginVertical: 10,
+  }}
+>
+  <Text style={{ fontWeight: "bold" }}>📤 Partager cette course</Text>
+</TouchableOpacity>
+
+<View style={{ position: "absolute", top: -1000 }} ref={shareViewRef} collapsable={false}>
+  <ShareCard
+    path={path}
+    distance={course.distance}
+    duration={course.duration}
+    avg_speed={course.avg_speed || 0}
+    date={new Date(course.start_time).toLocaleDateString()}
+    userEmail={course.email}
+    profile_picture={course.profile_picture}
+  />
+</View>
+
+
     </ScrollView>
   </KeyboardAvoidingView>
 );
