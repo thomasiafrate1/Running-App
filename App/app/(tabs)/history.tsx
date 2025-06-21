@@ -217,7 +217,7 @@ export default function HistoryScreen() {
     </View>
     
   )}
-  <View style={styles.row}>
+  <View style={styles.row2}>
   <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
     <Ionicons name="heart" size={18} color="#fdd835" />
     <Text style={{ color: "#fff" }}>{item.likeCount || 0}</Text>
@@ -257,14 +257,19 @@ export default function HistoryScreen() {
       </View>
 
       {loading ? (
-        <Text style={styles.loading}>Chargement...</Text>
-      ) : (
-        <FlatList
-          data={courses}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderItem}
-        />
-      )}
+  <Text style={styles.loading}>Chargement...</Text>
+) : courses.length === 0 ? (
+  <Text style={styles.loading}>
+    {viewMode === "mine" ? "Aucune course effectuée." : "Aucune course à afficher."}
+  </Text>
+) : (
+  <FlatList
+    data={courses}
+    keyExtractor={(item) => item.id.toString()}
+    renderItem={renderItem}
+  />
+)}
+
     </View>
   );
 }
@@ -342,7 +347,7 @@ avatarPlaceholder: {
     borderBottomColor: "#fdd835",
     borderWidth: 1,
     overflow: "hidden",
-    
+    height: 125,
   },
   row: {
   flexDirection: "row",
@@ -351,10 +356,18 @@ avatarPlaceholder: {
   marginLeft: 20,
   marginRight: 20,
 },
+row2: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  marginTop: 4,
+  marginLeft: 20,
+  marginRight: 20,
+  
+},
 
   map: {
     width: 120,
-    height: 100,
+    height: 150,
     borderTopLeftRadius: 12,
     borderBottomLeftRadius: 12,
   },
