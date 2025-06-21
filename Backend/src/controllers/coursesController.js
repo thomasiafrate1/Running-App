@@ -173,3 +173,30 @@ exports.getUserStats = (req, res) => {
   );
 };
 
+exports.getWeeklyStats = (req, res) => {
+  const userId = req.user.id;
+
+  db.query(
+    `
+    SELECT 
+      DATE(start_time) AS date, 
+      SUM(distance) AS total_distance 
+    FROM courses 
+    WHERE user_id = ? 
+      AND start_time >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+    GROUP BY DATE(start_time)
+    ORDER BY date ASC
+    `,
+    [userId],
+    (err, results) => {
+      if (err) {
+        console.error("Erreur weekly stats :", err);
+        return res.status(500).json({ message: "Erreur serveur", err });
+      }
+
+      res.json(results);
+    }
+  );
+};
+
+

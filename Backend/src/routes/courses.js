@@ -10,7 +10,8 @@ const {
   getCoursesByUserId,
   getRecentCourses,
   getPublicCourseById,
-  getUserStats
+  getUserStats,
+  getWeeklyStats
 } = require("../controllers/coursesController");
 
 router.post("/", authMiddleware, addCourse);
@@ -23,6 +24,8 @@ router.get("/recent", getRecentCourses);
 router.get("/public/:id", getPublicCourseById);
 router.get("/:id", authMiddleware, getCourseById);
 router.delete("/:id", authMiddleware, deleteCourse);
+router.get("/weekly-stats", authMiddleware, getWeeklyStats);
+
 
 
 

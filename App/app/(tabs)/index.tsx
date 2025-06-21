@@ -1,8 +1,12 @@
 import { useEffect, useState, useCallback  } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native";
 import MapView, { Polyline } from "react-native-maps";
 import { getToken } from "../../utils/token";
 import { useFocusEffect } from "@react-navigation/native";
+import { LineChart } from "react-native-chart-kit";
+
+
+
 
 type Course = {
   id: number;
@@ -32,6 +36,8 @@ export default function HomeScreen() {
   const [lastCourse, setLastCourse] = useState<Course | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
+  const [weeklyData, setWeeklyData] = useState<number[]>([]);
+
 
   const darkMapStyle = [
   {
@@ -106,18 +112,43 @@ useFocusEffect(
       const token = await getToken();
 
       try {
-        const resStats = await fetch(`http://192.168.1.42:3000/api/courses/stats`, {
+        const resStats = await fetch(`http://192.168.1.64:3000/api/courses/stats`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const resCourses = await fetch(`http://192.168.1.42:3000/api/courses`, {
+        const resCourses = await fetch(`http://192.168.1.64:3000/api/courses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const resGoal = await fetch(`http://192.168.1.42:3000/api/goals/daily`, {
+        const resGoal = await fetch(`http://192.168.1.64:3000/api/goals/daily`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         const statsData = await resStats.json();
         const courses = await resCourses.json();
+
+const now = new Date();
+const thisWeek: number[] = Array(7).fill(0);
+
+courses.forEach((course: Course) => {
+  const courseDate = new Date(course.start_time);
+
+  // Trouver le lundi de cette semaine
+  const currentDay = now.getDay(); // 0 = dimanche, 1 = lundi...
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - ((currentDay + 6) % 7)); // lundi de la semaine
+
+  // Comparer avec la date de la course
+  const isSameWeek =
+    courseDate >= monday && courseDate <= now;
+
+  if (isSameWeek) {
+    const dayIndex = (courseDate.getDay() + 6) % 7; // transforme dimanche (0) en 6, lundi en 0, etc.
+    thisWeek[dayIndex] += course.distance;
+  }
+});
+
+setWeeklyData(thisWeek);
+
+
         const goalData = await resGoal.json();
         console.log("🎯 Objectif reçu :", goalData);
 
@@ -136,16 +167,22 @@ useFocusEffect(
       } catch (err) {
         console.error("Erreur de chargement :", err);
       }
+
+      
+
     };
 
     fetchData();
   }, [])
 );
 
+  console.log("📊 weeklyData = ", weeklyData);
 
 
   return (
     <ScrollView style={styles.container}>
+
+      
       <Text style={styles.title}>Tableau de bord</Text>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Mes statistiques</Text>
@@ -212,6 +249,30 @@ useFocusEffect(
     </Text>
   </View>
 )}
+      {weeklyData.length > 0 && (
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>Évolution</Text>
+    <LineChart
+      data={{
+        labels: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+        datasets: [{ data: weeklyData }],
+      }}
+      width={Dimensions.get("window").width - 80}
+      height={220}
+      yAxisSuffix=" km"
+      chartConfig={{
+        backgroundColor: "#1c1c1c",
+        backgroundGradientFrom: "#2c2c2c",
+        backgroundGradientTo: "#2c2c2c",
+        decimalPlaces: 1,
+        color: (opacity = 1) => `rgba(253, 216, 53, ${opacity})`,
+        labelColor: () => "#fff",
+      }}
+      bezier
+      style={{ borderRadius: 10}}
+    />
+  </View>
+)}
 
 
     </ScrollView>
@@ -236,9 +297,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#2c2c2c",
     borderRadius: 12,
     padding: 15,
-    marginBottom: 20,
+    marginBottom: 30,
     borderColor: "#fdd835",
     borderWidth: 1,
+
   },
   sectionTitle: {
     fontSize: 18,
@@ -256,7 +318,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#2c2c2c",
     borderRadius: 10,
     padding: 15,
-    marginBottom: 20,
+    marginBottom: 30,
     borderColor: "#fdd835",
     borderWidth: 1,
   },
