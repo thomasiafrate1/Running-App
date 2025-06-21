@@ -4,6 +4,7 @@ import { getToken, removeToken } from "../../utils/token";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 
 
@@ -59,7 +60,7 @@ export default function ProfileScreen() {
 
     const data = await res.json();
     if (res.ok) {
-      Alert.alert("✅ Photo mise à jour !");
+      Alert.alert("Photo mise à jour.");
       setUser({ ...user!, profile_picture: base64Image });
     } else {
       Alert.alert("Erreur", data.message || "Échec de la mise à jour");
@@ -184,31 +185,46 @@ if (Array.isArray(data)) {
     router.replace("/login");
   };
 
-  
+  console.log("User", user?.username)
 
   return (
   <View style={styles.container}>
+    <View style={styles.logoutIconWrapper}>
+  <TouchableOpacity onPress={() => {
+    Alert.alert(
+      "Déconnexion",
+      "Êtes-vous sûr de vouloir vous déconnecter ?",
+      [
+        { text: "Annuler", style: "cancel" },
+        { text: "Se déconnecter", style: "destructive", onPress: handleLogout }
+      ]
+    );
+  }}>
+    <Ionicons name="log-out-outline" size={26} color="#fdd835" />
+  </TouchableOpacity>
+</View>
+
     <Text style={styles.title}>Profil</Text>
 
     {user && (
   <View style={styles.userBox}>
-    {user.profile_picture ? (
-      <View style={styles.avatarWrapper}>
+    <View style={styles.avatarContainer}>
+      {user.profile_picture ? (
         <Image source={{ uri: user.profile_picture }} style={styles.avatar} />
-      </View>
-      
-    ) : (
-      <View style={styles.avatarPlaceholder}>
-        <Text style={{ color: "#666" }}>Pas de photo</Text>
-      </View>
-    )}
-    <TouchableOpacity onPress={pickImage} style={styles.logoutButton}>
-      <Text style={styles.logoutText}>Changer la photo</Text>
-    </TouchableOpacity>
+      ) : (
+        <View style={styles.avatarPlaceholder}>
+          <Text style={{ color: "#666" }}>Pas de photo</Text>
+        </View>
+      )}
+      <TouchableOpacity onPress={pickImage} style={styles.editIcon}>
+        <Ionicons name="pencil" size={20} color="#1c1c1c" />
+      </TouchableOpacity>
+    </View>
     <Text style={styles.username}>{user.username}</Text>
-    <Text style={styles.userText}>{user.email}</Text>
+    <Text style={styles.email}>{user.email}</Text>
   </View>
 )}
+
 
 
     {stats && (
@@ -245,11 +261,7 @@ if (Array.isArray(data)) {
       </>
     )}
 
-    <View style={styles.bottom}>
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Se déconnecter</Text>
-      </TouchableOpacity>
-    </View>
+
   </View>
 );
 
@@ -264,6 +276,41 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
   },
+  logoutIconWrapper: {
+  position: "absolute",
+  top: 40,
+  right: 20,
+  zIndex: 10,
+},
+
+avatarContainer: {
+  position: "relative",
+  width: 100,
+  height: 100,
+  marginBottom: 10,
+},
+editIcon: {
+  position: "absolute",
+  bottom: 0,
+  right: 0,
+  backgroundColor: "#fdd835",
+  borderRadius: 20,
+  padding: 4,
+  borderWidth: 2,
+  borderColor: "#1c1c1c", // pour bien découper sur fond sombre
+},
+username: {
+  fontSize: 22,
+  fontWeight: "bold",
+  color: "#fdd835",
+  marginBottom: 3,
+},
+email: {
+  fontSize: 14,
+  color: "#ccc",
+  marginBottom: 10,
+},
+
   title: {
     fontSize: 26,
     fontWeight: "bold",
@@ -349,7 +396,9 @@ const styles = StyleSheet.create({
 avatar: {
   width: "100%",
   height: "100%",
-  resizeMode: "cover",
+  borderRadius: 50, // ✅ rend l'image ronde
+  borderWidth: 2,
+  borderColor: "#fdd835",
 },
 avatarPlaceholder: {
   width: 100,
@@ -360,11 +409,6 @@ avatarPlaceholder: {
   alignItems: "center",
   marginBottom: 10,
 },
-username: {
-  fontSize: 20,
-  fontWeight: "bold",
-  color: "#fdd835",
-  marginBottom: 5,
-},
+
 
 });

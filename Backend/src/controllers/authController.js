@@ -364,3 +364,20 @@ exports.verifyEmail = (req, res) => {
   );
 };
 
+
+
+exports.getMe = (req, res) => {
+  const userId = req.user.id;
+
+  db.query(
+    "SELECT id, email, username, profile_picture FROM users WHERE id = ?",
+    [userId],
+    (err, results) => {
+      if (err || results.length === 0) {
+        return res.status(404).json({ message: "Utilisateur non trouvé" });
+      }
+
+      res.json({ user: results[0] });
+    }
+  );
+};
