@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import { getToken } from "../../utils/token";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function ChangePasswordScreen() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [current, setCurrent] = useState("");
   const router = useRouter();
-  const [current, setCurrent] = useState(""); 
+  const { theme } = useTheme();
+
+  const isDark = theme === "dark";
+  const backgroundColor = isDark ? "#1c1c1c" : "#fff";
+  const textColor = isDark ? "#fff" : "#1c1c1c";
+  const inputBg = isDark ? "#2c2c2c" : "#eee";
+  const inputText = isDark ? "#fff" : "#000";
 
   const handleChange = async () => {
     if (!password || password.length < 6) {
@@ -30,9 +37,9 @@ export default function ChangePasswordScreen() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-  currentPassword: current,
-  newPassword: password,
-}),
+          currentPassword: current,
+          newPassword: password,
+        }),
       });
 
       const data = await res.json();
@@ -49,21 +56,20 @@ export default function ChangePasswordScreen() {
   };
 
   return (
-    <View style={styles.container}>
-        <Text style={styles.title}>Mot de passe actuel</Text>
-        <TextInput
-        style={styles.input}
+    <View style={[styles.container, { backgroundColor }]}>
+      <Text style={[styles.title, { color: "#fdd835" }]}>Mot de passe actuel</Text>
+      <TextInput
+        style={[styles.input, { backgroundColor: inputBg, color: inputText }]}
         placeholder="Mot de passe actuel"
         placeholderTextColor="#aaa"
         secureTextEntry
         value={current}
         onChangeText={setCurrent}
-        />
+      />
 
-      <Text style={styles.title}>Changer le mot de passe</Text>
-
+      <Text style={[styles.title, { color: "#fdd835" }]}>Nouveau mot de passe</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: inputBg, color: inputText }]}
         placeholder="Nouveau mot de passe"
         placeholderTextColor="#aaa"
         secureTextEntry
@@ -72,7 +78,7 @@ export default function ChangePasswordScreen() {
       />
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: inputBg, color: inputText }]}
         placeholder="Confirmer le mot de passe"
         placeholderTextColor="#aaa"
         secureTextEntry
@@ -90,25 +96,21 @@ export default function ChangePasswordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1c1c1c",
     padding: 20,
     justifyContent: "center",
   },
   title: {
-    fontSize: 22,
-    color: "#fdd835",
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 12,
     textAlign: "center",
   },
   input: {
-    backgroundColor: "#2c2c2c",
     borderColor: "#fdd835",
     borderWidth: 1,
     borderRadius: 8,
     padding: 12,
     marginBottom: 15,
-    color: "white",
   },
   button: {
     backgroundColor: "#fdd835",

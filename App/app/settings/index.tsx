@@ -1,32 +1,42 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-
+import { useTheme } from "../../context/ThemeContext";
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
+
+  const isDark = theme === "dark";
+  const backgroundColor = isDark ? "#1c1c1c" : "#f9f9f9";
+  const textColor = isDark ? "#fff" : "#1c1c1c";
+  const sectionColor = "#fdd835";
+  const borderColor = isDark ? "#333" : "#ddd";
 
   const Item = ({ icon, label, path }: { icon: any; label: string; path: string }) => (
-    <TouchableOpacity style={styles.item} onPress={() => router.push(path)}>
-      <Ionicons name={icon} size={20} color="#fdd835" style={{ marginRight: 12 }} />
-      <Text style={styles.itemText}>{label}</Text>
+    <TouchableOpacity
+      style={[styles.item, { borderBottomColor: borderColor }]}
+      onPress={() => router.push(path)}
+    >
+      <Ionicons name={icon} size={20} color={sectionColor} style={{ marginRight: 12 }} />
+      <Text style={[styles.itemText, { color: textColor }]}>{label}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Paramètres</Text>
+    <ScrollView style={[styles.container, { backgroundColor }]}>
+      <Text style={[styles.title, { color: sectionColor }]}>Paramètres</Text>
 
-      <Text style={styles.section}>Compte & Sécurité</Text>
+      <Text style={[styles.section, { color: sectionColor }]}>Compte & Sécurité</Text>
       <Item icon="key-outline" label="Changer le mot de passe" path="/settings/change-password" />
       <Item icon="mail-outline" label="Changer l'adresse email" path="/settings/change-email" />
       <Item icon="trash-outline" label="Supprimer mon compte" path="/settings/delete-account" />
 
-      <Text style={styles.section}>Apparence</Text>
+      <Text style={[styles.section, { color: sectionColor }]}>Apparence</Text>
       <Item icon="color-palette-outline" label="Thème" path="/settings/theme" />
       <Item icon="language-outline" label="Langue" path="/settings/language" />
 
-      <Text style={styles.section}>Support & Infos</Text>
+      <Text style={[styles.section, { color: sectionColor }]}>Support & Infos</Text>
       <Item icon="notifications-outline" label="Notifications" path="/settings/notifications" />
       <Item icon="chatbubble-ellipses-outline" label="Donner un avis" path="/settings/feedback" />
       <Item icon="information-circle-outline" label="À propos" path="/settings/about" />
@@ -37,20 +47,17 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1c1c1c",
     padding: 20,
   },
   title: {
     fontSize: 26,
     fontWeight: "bold",
-    color: "#fdd835",
     marginBottom: 20,
     textAlign: "center",
   },
   section: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#fdd835",
     marginTop: 25,
     marginBottom: 10,
   },
@@ -58,11 +65,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 12,
-    borderBottomColor: "#333",
     borderBottomWidth: 1,
   },
   itemText: {
-    color: "white",
     fontSize: 15,
   },
 });

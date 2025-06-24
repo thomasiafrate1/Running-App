@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { getToken } from "../utils/token";
+import { useTheme } from "../context/ThemeContext";
 
 type Notification = {
   id: number;
@@ -11,6 +12,14 @@ type Notification = {
 
 export default function NotificationsScreen() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const { theme } = useTheme();
+
+  const isDark = theme === "dark";
+  const bgColor = isDark ? "#1c1c1c" : "#fff";
+  const titleColor = isDark ? "#fdd835" : "#222";
+  const subtitleColor = isDark ? "#ccc" : "#444";
+  const cardBg = isDark ? "#fdd835" : "#f6f6f6";
+  const cardText = isDark ? "#000" : "#000";
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -33,15 +42,16 @@ export default function NotificationsScreen() {
   }, []);
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>🔔 Notifications</Text>
-      <Text style={styles.subtitle}>Vous avez {notifications.length} notifications :</Text>
+    <ScrollView style={[styles.container, { backgroundColor: bgColor }]}>
+      <Text style={[styles.title, { color: titleColor }]}>🔔 Notifications</Text>
+      <Text style={[styles.subtitle, { color: subtitleColor }]}>
+        Vous avez {notifications.length} notifications :
+      </Text>
 
       {notifications.map((notif) => (
-        <View key={notif.id} style={styles.card}>
-          <Text style={styles.cardTitle}>{notif.title}</Text>
-          <Text style={styles.cardMessage}>{notif.message}</Text>
-
+        <View key={notif.id} style={[styles.card, { backgroundColor: cardBg }]}>
+          <Text style={[styles.cardTitle, { color: cardText }]}>{notif.title}</Text>
+          <Text style={[styles.cardMessage, { color: cardText }]}>{notif.message}</Text>
         </View>
       ))}
     </ScrollView>
@@ -50,24 +60,20 @@ export default function NotificationsScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#1c1c1c",
     flex: 1,
     padding: 20,
   },
   title: {
     fontSize: 28,
-    color: "#fdd835",
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center",
   },
   subtitle: {
-    color: "#fff",
     fontSize: 16,
     marginBottom: 20,
   },
   card: {
-    backgroundColor: "#fdd835",
     borderRadius: 15,
     padding: 15,
     marginBottom: 15,
@@ -76,22 +82,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
     marginBottom: 5,
-    color: "#000",
   },
   cardMessage: {
     fontSize: 14,
-    color: "#000",
-    marginBottom: 10,
-  },
-  button: {
-    backgroundColor: "#1c1c1c",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    alignSelf: "flex-start",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
   },
 });

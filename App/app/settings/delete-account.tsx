@@ -1,9 +1,15 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { getToken, removeToken } from "../../utils/token";
 import { useRouter } from "expo-router";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function DeleteAccountScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
+  const backgroundColor = isDark ? "#1c1c1c" : "#fff";
+  const textColor = isDark ? "#fff" : "#1c1c1c";
 
   const confirmDelete = async () => {
     Alert.alert(
@@ -42,8 +48,8 @@ export default function DeleteAccountScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Supprimer mon compte</Text>
+    <View style={[styles.container, { backgroundColor }]}>
+      <Text style={[styles.title, { color: "#f44336" }]}>Supprimer mon compte</Text>
       <TouchableOpacity style={styles.deleteButton} onPress={confirmDelete}>
         <Text style={styles.deleteText}>Supprimer définitivement</Text>
       </TouchableOpacity>
@@ -54,13 +60,11 @@ export default function DeleteAccountScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1c1c1c",
     padding: 20,
     justifyContent: "center",
   },
   title: {
     fontSize: 22,
-    color: "#fdd835",
     fontWeight: "bold",
     marginBottom: 25,
     textAlign: "center",

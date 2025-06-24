@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { getToken } from "../utils/token";
+import { useTheme } from "../context/ThemeContext";
 
 type User = {
   id: number;
@@ -21,6 +22,13 @@ type User = {
 export default function LeaderboardScreen() {
   const [leaderboard, setLeaderboard] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const { theme } = useTheme();
+
+  const isDark = theme === "dark";
+  const backgroundColor = isDark ? "#1c1c1c" : "#fff";
+  const cardColor = isDark ? "#2c2c2c" : "#f5f5f5";
+  const usernameColor = isDark ? "#fff" : "#1c1c1c";
+  const detailColor = isDark ? "#ccc" : "#444";
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -44,17 +52,24 @@ export default function LeaderboardScreen() {
   }, []);
 
   if (loading) {
-    return <ActivityIndicator style={{ marginTop: 50 }} color="#fdd835" />;
+    return (
+      <ActivityIndicator
+        style={{ marginTop: 50 }}
+        color="#fdd835"
+      />
+    );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>🏆 Leaderboard</Text>
+    <View style={[styles.container, { backgroundColor }]}>
+      <Text style={[styles.title, { color: isDark ? "#fdd835" : "#333" }]}>
+        🏆 Leaderboard
+      </Text>
       <FlatList
         data={leaderboard}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item, index }) => (
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: cardColor }]}>
             <Text style={styles.rank}>#{index + 1}</Text>
             <Image
               source={
@@ -65,8 +80,10 @@ export default function LeaderboardScreen() {
               style={styles.avatar}
             />
             <View style={{ flex: 1 }}>
-              <Text style={styles.username}>{item.username || item.email}</Text>
-              <Text style={styles.detail}>
+              <Text style={[styles.username, { color: usernameColor }]}>
+                {item.username || item.email}
+              </Text>
+              <Text style={[styles.detail, { color: detailColor }]}>
                 {item.totalDistance?.toFixed(2) || 0} km | {item.courseCount} courses
               </Text>
             </View>
@@ -80,20 +97,17 @@ export default function LeaderboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1c1c1c",
     padding: 16,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#fdd835",
     marginBottom: 20,
     textAlign: "center",
   },
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2c2c2c",
     padding: 12,
     borderRadius: 10,
     marginBottom: 10,
@@ -115,11 +129,8 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "white",
   },
   detail: {
-    color: "#ccc",
     fontSize: 13,
   },
 });
-

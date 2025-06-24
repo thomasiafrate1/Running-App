@@ -1,52 +1,54 @@
-// app/(tabs)/menu.tsx
-
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function MenuScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
+  const backgroundColor = isDark ? "#1c1c1c" : "#fff";
+  const itemBg = isDark ? "#2c2c2c" : "#eee";
+  const textColor = isDark ? "#fff" : "#1c1c1c";
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>☰ Menu</Text>
+    <ScrollView style={[styles.container, { backgroundColor }]}>
+      <Text style={[styles.title, { color: "#fdd835" }]}>☰ Menu</Text>
 
       <TouchableOpacity
-        style={styles.item}
+        style={[styles.item, { backgroundColor: itemBg }]}
         onPress={() => router.push("/notifications")}
       >
         <Ionicons name="notifications" size={22} color="#fdd835" />
-        <Text style={styles.text}>Notifications</Text>
+        <Text style={[styles.text, { color: textColor }]}>Notifications</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.item}
+        style={[styles.item, { backgroundColor: itemBg }]}
         onPress={() => router.push("/leaderboard")}
       >
         <Ionicons name="trophy" size={22} color="#fdd835" />
-        <Text style={styles.text}>Classement</Text>
+        <Text style={[styles.text, { color: textColor }]}>Classement</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.item}
+        style={[styles.item, { backgroundColor: itemBg }]}
         onPress={() => router.push("/settings")}
       >
         <Ionicons name="settings" size={22} color="#fdd835" />
-        <Text style={styles.text}>Paramètres</Text>
+        <Text style={[styles.text, { color: textColor }]}>Paramètres</Text>
       </TouchableOpacity>
-
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#1c1c1c",
     flex: 1,
     padding: 20,
   },
   title: {
-    color: "#fdd835",
     fontSize: 26,
     fontWeight: "bold",
     marginBottom: 25,
@@ -54,13 +56,11 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2c2c2c",
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,
   },
   text: {
-    color: "#fff",
     fontSize: 16,
     marginLeft: 12,
   },

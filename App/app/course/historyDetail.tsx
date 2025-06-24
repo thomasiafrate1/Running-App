@@ -21,6 +21,8 @@ import { captureRef } from "react-native-view-shot";
 import * as MediaLibrary from "expo-media-library";
 import * as Sharing from "expo-sharing";
 import ShareCard from "../../components/ShareCard";
+import { useTheme } from "../../context/ThemeContext";
+
 
 
 
@@ -123,6 +125,16 @@ export default function HistoryDetailScreen() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [showModal, setShowModal] = useState(false);
+ const { theme } = useTheme();
+const isDark = theme === "dark";
+
+const backgroundColor = isDark ? "#1c1c1c" : "#fff";
+const textColor = isDark ? "#fff" : "#1c1c1c";
+const cardBg = isDark ? "#2c2c2c" : "#f2f2f2";
+const inputBg = isDark ? "#2c2c2c" : "#e0e0e0";
+const placeholderColor = isDark ? "#888" : "#555";
+const borderColor = "#fdd835";
+
   
 
 
@@ -258,17 +270,17 @@ const handleShare = async () => {
 return (
   <KeyboardAvoidingView
     behavior={Platform.OS === "ios" ? "padding" : undefined}
-    style={{ flex: 1, backgroundColor: "#1c1c1c" }}
+    style={{ flex: 1, backgroundColor }}
   >
     <ScrollView
-      contentContainerStyle={styles.container}
+      contentContainerStyle={[styles.container, { backgroundColor }]}
       showsVerticalScrollIndicator={false}
     >
-      <View style={styles.header}>
+     <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#fdd835" />
+          <Ionicons name="arrow-back" size={24} color={borderColor} />
         </TouchableOpacity>
-        <Text style={styles.title}>Détails de la course</Text>
+        <Text style={[styles.title, { color: borderColor }]}>Détails de la course</Text>
       </View>
 
       {path.length > 0 ? (
@@ -280,13 +292,13 @@ return (
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
           }}
-          customMapStyle={darkMapStyle}
+          customMapStyle={isDark ? darkMapStyle : []}
         >
-          <Polyline coordinates={path} strokeColor="#fdd835" strokeWidth={4} />
+          <Polyline coordinates={path} strokeColor={borderColor} strokeWidth={4} />
         </MapView>
       ) : (
-        <View style={styles.noMap}>
-          <Text>Pas de trace GPS</Text>
+        <View style={[styles.noMap, { backgroundColor: cardBg }]}>
+          <Text style={{ color: textColor }}>Pas de trace GPS</Text>
         </View>
       )}
 
@@ -299,43 +311,34 @@ return (
               height: 80,
               borderRadius: 40,
               borderWidth: 2,
-              borderColor: "#fdd835",
+              borderColor,
               marginBottom: 10,
             }}
           />
         </View>
       )}
 
-      {course.email && <Text style={styles.infoText}>{course.email}</Text>}
+      {course.email && <Text style={[styles.infoText, { color: textColor }]}>{course.email}</Text>}
 
       <View style={styles.info}>
-        <Text style={styles.infoBox}>{course.distance.toFixed(2)} km</Text>
-        <Text style={styles.infoBox}>{formatDuration(course.duration)}</Text>
+        <Text style={[styles.infoBox, { color: textColor, borderColor }]}>{course.distance.toFixed(2)} km</Text>
+        <Text style={[styles.infoBox, { color: textColor, borderColor }]}>{formatDuration(course.duration)}</Text>
       </View>
 
       <View style={styles.info}>
-        <Text style={styles.infoBox}>{new Date(course.start_time).toLocaleString()}</Text>
+        <Text style={[styles.infoBox, { color: textColor, borderColor }]}>{new Date(course.start_time).toLocaleString()}</Text>
         {course.avg_speed != null && (
-          <Text style={styles.infoBox}>{course.avg_speed.toFixed(2)} km/h</Text>
+          <Text style={[styles.infoBox, { color: textColor, borderColor }]}>{course.avg_speed.toFixed(2)} km/h</Text>
         )}
       </View>
 
       {/* ❤️ Likes */}
       <TouchableOpacity
         onPress={handleLike}
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          marginVertical: 12,
-        }}
+        style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 12 }}
       >
-        <Ionicons
-          name={liked ? "heart" : "heart-outline"}
-          size={28}
-          color={liked ? "red" : "#fdd835"}
-        />
-        <Text style={{ color: "white", marginLeft: 10 }}>{likeCount} j’aime</Text>
+        <Ionicons name={liked ? "heart" : "heart-outline"} size={28} color={liked ? "red" : borderColor} />
+        <Text style={{ color: textColor, marginLeft: 10 }}>{likeCount} j’aime</Text>
       </TouchableOpacity>
 
       {/* 🚀 Mode Défi (si c'est sa propre course) */}
@@ -373,15 +376,15 @@ return (
         </Modal>
 
       {/* 💬 Commentaires */}
-      <Text style={[styles.infoText, { fontSize: 20, marginTop: 10 }]}>Commesntaires</Text>
+      <Text style={[styles.infoText, { fontSize: 20, marginTop: 10, color: textColor }]}>Commentaires</Text>
 
       {comments.map((comment, index) => (
-        <View key={index} style={{ backgroundColor: "#2c2c2c", padding: 10, borderRadius: 8, marginVertical: 5 }}>
+        <View key={index} style={{ backgroundColor: inputBg, padding: 10, borderRadius: 8, marginVertical: 5 }}>
   <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-    <Text style={{ color: "#fdd835", fontWeight: "bold" }}>{comment.username}</Text>
+    <Text style={{ color: textColor, fontWeight: "bold" }}>{comment.username}</Text>
     <Text style={{ color: "#999", fontSize: 12 }}>{new Date(comment.created_at).toLocaleString()}</Text>
   </View>
-  <Text style={{ color: "white", marginTop: 5 }}>{comment.content}</Text>
+  <Text style={{ color: textColor, marginTop: 5 }}>{comment.content}</Text>
 </View>
 
       ))}
@@ -392,14 +395,14 @@ return (
           flexDirection: "row",
           marginTop: 10,
           alignItems: "center",
-          backgroundColor: "#2c2c2c",
+          backgroundColor: inputBg,
           paddingHorizontal: 10,
           borderRadius: 8,
           marginBottom: 30, // espace pour éviter le bas masqué
         }}
       >
         <TextInput
-          style={{ color: "white", flex: 1, padding: 10 }}
+          style={{ color: textColor, flex: 1, padding: 10 }}
           placeholder="Ajouter un commentaire"
           placeholderTextColor="#888"
           value={newComment}

@@ -8,12 +8,19 @@ import {
   StyleSheet,
 } from "react-native";
 import { getToken } from "../../utils/token";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function ChangeEmailScreen() {
   const [newEmail, setNewEmail] = useState("");
   const router = useRouter();
+  const { theme } = useTheme();
+
+  const isDark = theme === "dark";
+  const backgroundColor = isDark ? "#1c1c1c" : "#fff";
+  const textColor = isDark ? "#fff" : "#1c1c1c";
+  const inputBg = isDark ? "#2c2c2c" : "#eee";
+  const inputText = isDark ? "#fff" : "#000";
 
   const handleChange = async () => {
     if (!newEmail || !newEmail.includes("@")) {
@@ -50,11 +57,11 @@ export default function ChangeEmailScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Changer mon email</Text>
+    <View style={[styles.container, { backgroundColor }]}>
+      <Text style={[styles.title, { color: "#fdd835" }]}>Changer mon email</Text>
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: inputBg, color: inputText }]}
         placeholder="Nouvelle adresse email"
         placeholderTextColor="#aaa"
         keyboardType="email-address"
@@ -73,25 +80,21 @@ export default function ChangeEmailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1c1c1c",
     padding: 20,
     justifyContent: "center",
   },
   title: {
     fontSize: 22,
-    color: "#fdd835",
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
   },
   input: {
-    backgroundColor: "#2c2c2c",
     borderColor: "#fdd835",
     borderWidth: 1,
     borderRadius: 8,
     padding: 12,
     marginBottom: 15,
-    color: "white",
   },
   button: {
     backgroundColor: "#fdd835",

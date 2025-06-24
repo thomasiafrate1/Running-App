@@ -2,6 +2,7 @@ import { Stack, useRouter, usePathname } from "expo-router";
 import { useEffect, useState } from "react";
 import { getToken } from "../utils/token";
 import { View, ActivityIndicator, Text } from "react-native";
+import { ThemeProvider } from "../context/ThemeContext";
 
 export default function RootLayout() {
   const [loading, setLoading] = useState(true);
@@ -33,5 +34,9 @@ export default function RootLayout() {
     );
   }
 
-  return <Stack />;
+  return (
+    <ThemeProvider>
+      <Stack />
+    </ThemeProvider>
+  );
 }
