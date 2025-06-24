@@ -21,7 +21,7 @@ function authMiddleware(req, res, next) {
         return res.status(401).json({ message: "Utilisateur non trouvé" });
       }
 
-      req.user = results[0]; // ✅ contient maintenant { id, email }
+      req.user = results[0]; 
       next();
     });
   } catch (err) {

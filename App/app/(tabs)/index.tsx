@@ -112,13 +112,13 @@ useFocusEffect(
       const token = await getToken();
 
       try {
-        const resStats = await fetch(`http://192.168.1.64:3000/api/courses/stats`, {
+        const resStats = await fetch(`http://192.168.1.42:3000/api/courses/stats`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const resCourses = await fetch(`http://192.168.1.64:3000/api/courses`, {
+        const resCourses = await fetch(`http://192.168.1.42:3000/api/courses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const resGoal = await fetch(`http://192.168.1.64:3000/api/goals/daily`, {
+        const resGoal = await fetch(`http://192.168.1.42:3000/api/goals/daily`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

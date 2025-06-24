@@ -49,7 +49,7 @@ export default function ProfileScreen() {
   const updateProfilePicture = async (base64Image: string) => {
   try {
     const token = await getToken();
-    const res = await fetch(`http://192.168.1.64:3000/api/auth/${user?.id}`, {
+    const res = await fetch(`http://192.168.1.42:3000/api/auth/${user?.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -97,7 +97,7 @@ useEffect(() => {
 
   const fetchGoalHistory = async () => {
   const token = await getToken();
-  const res = await fetch("http://192.168.1.64:3000/api/goals/history", {
+  const res = await fetch("http://192.168.1.42:3000/api/goals/history", {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await res.json();
@@ -121,7 +121,7 @@ if (Array.isArray(data)) {
       const token = await getToken();
       console.log("🔑 Token récupéré :", token);
 
-      const res = await fetch(`http://192.168.1.64:3000/api/courses/stats`, {
+      const res = await fetch(`http://192.168.1.42:3000/api/courses/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -144,7 +144,7 @@ if (Array.isArray(data)) {
        const fetchUser = async () => {
         const token = await getToken();
         try {
-          const res = await fetch("http://192.168.1.64:3000/api/auth/me", {
+          const res = await fetch("http://192.168.1.42:3000/api/auth/me", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -164,7 +164,7 @@ if (Array.isArray(data)) {
       const createDailyGoal = async () => {
     const token = await getToken();
     try {
-      await fetch("http://192.168.1.64:3000/api/goals/daily", {
+      await fetch("http://192.168.1.42:3000/api/goals/daily", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

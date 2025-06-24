@@ -27,7 +27,14 @@ export default function MenuScreen() {
         <Text style={styles.text}>Classement</Text>
       </TouchableOpacity>
 
-      {/* Tu peux ajouter plus d’éléments ici plus tard */}
+      <TouchableOpacity
+        style={styles.item}
+        onPress={() => router.push("/settings")}
+      >
+        <Ionicons name="settings" size={22} color="#fdd835" />
+        <Text style={styles.text}>Paramètres</Text>
+      </TouchableOpacity>
+
     </ScrollView>
   );
 }

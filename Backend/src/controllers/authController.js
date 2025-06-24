@@ -250,7 +250,7 @@ exports.getTopUsers = (req, res) => {
 
 exports.updateUser = (req, res) => {
   const { id } = req.params;
-  const { email, role, username, profile_picture } = req.body;
+  const { email, role, username, profile_picture, password } = req.body;
 
 
   const fields = [];
@@ -275,6 +275,13 @@ if (profile_picture) {
   fields.push("profile_picture = ?");
   values.push(profile_picture);
 }
+
+if (password) {
+  const hashed = bcrypt.hashSync(password, 10);
+  fields.push("password = ?");
+  values.push(hashed);
+}
+
 
 
   if (fields.length === 0) {
@@ -380,4 +387,95 @@ exports.getMe = (req, res) => {
       res.json({ user: results[0] });
     }
   );
+};
+
+
+// 🔐 Changer le mot de passe
+exports.changePassword = (req, res) => {
+  const userId = req.user.id;
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ message: "Champs requis manquants." });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({ message: "Le nouveau mot de passe est trop court." });
+  }
+
+  // 1. On récupère le mot de passe actuel en DB
+  db.query("SELECT password FROM users WHERE id = ?", [userId], (err, results) => {
+    if (err || results.length === 0) {
+      return res.status(500).json({ message: "Erreur serveur ou utilisateur introuvable." });
+    }
+
+    const isValid = bcrypt.compareSync(currentPassword, results[0].password);
+    if (!isValid) {
+      return res.status(401).json({ message: "Mot de passe actuel incorrect." });
+    }
+
+    // 2. On met à jour
+    const hashed = bcrypt.hashSync(newPassword, 10);
+    db.query("UPDATE users SET password = ? WHERE id = ?", [hashed, userId], (err) => {
+      if (err) return res.status(500).json({ message: "Erreur lors de la mise à jour." });
+      res.json({ message: "Mot de passe changé avec succès." });
+    });
+  });
+};
+
+
+// 📧 Changer l'email
+exports.changeEmail = (req, res) => {
+  const userId = req.user.id;
+  const { newEmail } = req.body;
+
+  if (!newEmail || !newEmail.includes("@")) {
+    return res.status(400).json({ message: "Email invalide." });
+  }
+
+  db.query("UPDATE users SET email = ? WHERE id = ?", [newEmail, userId], (err) => {
+    if (err) return res.status(500).json({ message: "Erreur serveur." });
+    res.json({ message: "Email mis à jour." });
+  });
+};
+
+
+// 🗑 Supprimer le compte
+exports.deleteAccount = (req, res) => {
+  const userId = req.user.id;
+
+  db.query("DELETE FROM users WHERE id = ?", [userId], (err) => {
+    if (err) return res.status(500).json({ message: "Erreur lors de la suppression." });
+    res.json({ message: "Compte supprimé avec succès." });
+  });
+};
+
+
+exports.verifyNewEmail = (req, res) => {
+  const { token } = req.query;
+
+  if (!token) {
+    return res.status(400).send("Lien invalide.");
+  }
+
+  db.query("SELECT * FROM users WHERE email_verification_token = ?", [token], (err, results) => {
+    if (err || results.length === 0) {
+      return res.status(400).send("Token invalide ou expiré.");
+    }
+
+    const user = results[0];
+
+    if (!user.temp_email) {
+      return res.status(400).send("Aucun email temporaire trouvé.");
+    }
+
+    db.query(
+      "UPDATE users SET email = ?, temp_email = NULL, email_verification_token = NULL WHERE id = ?",
+      [user.temp_email, user.id],
+      (err) => {
+        if (err) return res.status(500).send("Erreur serveur.");
+        res.send("✅ Nouvelle adresse email vérifiée avec succès !");
+      }
+    );
+  });
 };
