@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../../context/ThemeContext";
 
 
 
@@ -44,7 +45,12 @@ export default function ProfileScreen() {
   const [stats, setStats] = useState<Stats | null>(null);
   const router = useRouter();
   const [goalHistory, setGoalHistory] = useState<Goal[]>([]);
-
+  const { theme } = useTheme();
+const isDark = theme === "dark";
+const backgroundColor = isDark ? "#1c1c1c" : "#fff";
+const textColor = isDark ? "#fff" : "#1c1c1c";
+const cardColor = isDark ? "#2c2c2c" : "#eee";
+const borderColor = "#fdd835";
 
   const updateProfilePicture = async (base64Image: string) => {
   try {
@@ -188,82 +194,79 @@ if (Array.isArray(data)) {
   console.log("User", user?.username)
 
   return (
-  <View style={styles.container}>
+  <View style={[styles.container, { backgroundColor }]}>
     <View style={styles.logoutIconWrapper}>
-  <TouchableOpacity onPress={() => {
-    Alert.alert(
-      "Déconnexion",
-      "Êtes-vous sûr de vouloir vous déconnecter ?",
-      [
-        { text: "Annuler", style: "cancel" },
-        { text: "Se déconnecter", style: "destructive", onPress: handleLogout }
-      ]
-    );
-  }}>
-    <Ionicons name="log-out-outline" size={26} color="#fdd835" />
-  </TouchableOpacity>
-</View>
-
-    <Text style={styles.title}>Profil</Text>
-
-    {user && (
-  <View style={styles.userBox}>
-    <View style={styles.avatarContainer}>
-      {user.profile_picture ? (
-        <Image source={{ uri: user.profile_picture }} style={styles.avatar} />
-      ) : (
-        <View style={styles.avatarPlaceholder}>
-          <Text style={{ color: "#666" }}>Pas de photo</Text>
-        </View>
-      )}
-      <TouchableOpacity onPress={pickImage} style={styles.editIcon}>
-        <Ionicons name="pencil" size={20} color="#1c1c1c" />
+      <TouchableOpacity
+        onPress={() =>
+          Alert.alert("Déconnexion", "Êtes-vous sûr de vouloir vous déconnecter ?", [
+            { text: "Annuler", style: "cancel" },
+            { text: "Se déconnecter", style: "destructive", onPress: handleLogout },
+          ])
+        }
+      >
+        <Ionicons name="log-out-outline" size={26} color="#fdd835" />
       </TouchableOpacity>
     </View>
-    <Text style={styles.username}>{user.username}</Text>
-    <Text style={styles.email}>{user.email}</Text>
-  </View>
-)}
 
+    <Text style={[styles.title, { color: borderColor }]}>Profil</Text>
 
+    {user && (
+      <View style={styles.userBox}>
+        <View style={styles.avatarContainer}>
+          {user.profile_picture ? (
+            <Image source={{ uri: user.profile_picture }} style={styles.avatar} />
+          ) : (
+            <View style={styles.avatarPlaceholder}>
+              <Text style={{ color: "#666" }}>Pas de photo</Text>
+            </View>
+          )}
+          <TouchableOpacity onPress={pickImage} style={styles.editIcon}>
+            <Ionicons name="pencil" size={20} color="#1c1c1c" />
+          </TouchableOpacity>
+        </View>
+        <Text style={[styles.username, { color: borderColor }]}>{user.username}</Text>
+        <Text style={[styles.email, { color: textColor }]}>{user.email}</Text>
+      </View>
+    )}
 
     {stats && (
       <>
-      
         <View style={styles.statsContainer}>
-          <View style={styles.statBox}>
-            <Text style={styles.statValue}>{stats.totalCourses}</Text>
-            <Text style={styles.statLabel}>Courses</Text>
+          <View style={[styles.statBox, { backgroundColor: cardColor, borderColor }]}>
+            <Text style={[styles.statValue, { color: borderColor }]}>{stats.totalCourses}</Text>
+            <Text style={[styles.statLabel, { color: textColor }]}>Courses</Text>
           </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statValue}>{stats.totalDistance.toFixed(2)} km</Text>
-            <Text style={styles.statLabel}>Distance</Text>
+          <View style={[styles.statBox, { backgroundColor: cardColor, borderColor }]}>
+            <Text style={[styles.statValue, { color: borderColor }]}>
+              {stats.totalDistance.toFixed(2)} km
+            </Text>
+            <Text style={[styles.statLabel, { color: textColor }]}>Distance</Text>
           </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statValue}>{Math.round(stats.totalDuration / 60)} min</Text>
-            <Text style={styles.statLabel}>Temps total</Text>
+          <View style={[styles.statBox, { backgroundColor: cardColor, borderColor }]}>
+            <Text style={[styles.statValue, { color: borderColor }]}>
+              {Math.round(stats.totalDuration / 60)} min
+            </Text>
+            <Text style={[styles.statLabel, { color: textColor }]}>Temps total</Text>
           </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statValue}>
+          <View style={[styles.statBox, { backgroundColor: cardColor, borderColor }]}>
+            <Text style={[styles.statValue, { color: borderColor }]}>
               {stats.avgSpeed != null ? stats.avgSpeed.toFixed(2) : "N/A"} km/h
             </Text>
-            <Text style={styles.statLabel}>Vitesse moy.</Text>
+            <Text style={[styles.statLabel, { color: textColor }]}>Vitesse moy.</Text>
           </View>
         </View>
 
         <View style={styles.goalSection}>
-          <Text style={styles.subTitle}>Objectifs Accomplis</Text>
-          <Text style={styles.goalSummary}>
+          <Text style={[styles.subTitle, { color: borderColor }]}>Objectifs Accomplis</Text>
+          <Text style={[styles.goalSummary, { color: textColor }]}>
             {goalHistory?.filter((g) => g.completed).length ?? 0}
           </Text>
-
         </View>
       </>
     )}
-
-
   </View>
 );
+
 
 
 }

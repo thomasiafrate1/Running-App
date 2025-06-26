@@ -5,6 +5,8 @@ import MapView, { Polyline } from "react-native-maps";
 import { getToken } from "../../utils/token";
 import * as Notifications from "expo-notifications";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { useTheme } from "../../context/ThemeContext";
+
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -43,6 +45,12 @@ const [goalMode, setGoalMode] = useState(false); // mode objectif
 const [targetPoint, setTargetPoint] = useState<{ latitude: number; longitude: number } | null>(null); // point d'arrivée
 const { challengePath } = useLocalSearchParams();
 const challengeCoords = challengePath ? JSON.parse(challengePath as string) : null;
+const { theme } = useTheme();
+const isDark = theme === "dark";
+const backgroundColor = isDark ? "#121212" : "#fff";
+const textColor = isDark ? "#fff" : "#1c1c1c";
+const cardBorder = "#f6b500";
+
 
 
 
@@ -104,6 +112,8 @@ const challengeCoords = challengePath ? JSON.parse(challengePath as string) : nu
     stylers: [{ color: "#3d3d3d" }],
   },
 ];
+
+const mapStyle = isDark ? darkMapStyle : [];
 
 
 
@@ -304,9 +314,7 @@ const startRun = () => {
   }
 
 return (
-  <View style={{ flex: 1 }}>
-    
-
+  <View style={{ flex: 1, backgroundColor }}>
     <MapView
       style={{ flex: 1 }}
       initialRegion={{
@@ -315,7 +323,7 @@ return (
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       }}
-      customMapStyle={darkMapStyle}
+      customMapStyle={mapStyle}
       showsUserLocation
       onPress={(e) => {
         if (!running && goalMode) {
@@ -325,18 +333,16 @@ return (
         }
       }}
     >
-      {/* Trajet effectué */}
       <Polyline coordinates={path} strokeColor="#f6b500" strokeWidth={4} />
       {challengeCoords && (
-  <Polyline
-    coordinates={challengeCoords}
-    strokeColor="#999"  // gris
-    strokeWidth={3}
-    lineDashPattern={[4, 6]} // pointillés pour différencier
-  />
-)}
+        <Polyline
+          coordinates={challengeCoords}
+          strokeColor="#999"
+          strokeWidth={3}
+          lineDashPattern={[4, 6]}
+        />
+      )}
 
-      {/* Trait A ➝ B si en mode objectif */}
       {goalMode && targetPoint && location && (
         <Polyline
           coordinates={[
@@ -349,65 +355,75 @@ return (
           strokeColor="green"
           strokeDasharray={[5, 5]}
           strokeWidth={2}
-          
         />
       )}
     </MapView>
-    
 
-    <View style={styles.panel}>
+    <View style={[styles.panel, { backgroundColor }]}>
       <View style={styles.button2}>
         <Button
           title={goalMode ? "🎯 Mode objectif activé" : "🏃 Mode libre activé"}
-          color={goalMode ? "#f6b500" :"rgb(33, 243, 68)"}
-          
+          color={goalMode ? "#f6b500" : "rgb(33, 243, 68)"}
           onPress={() => {
             setGoalMode(!goalMode);
-            setTargetPoint(null); 
+            setTargetPoint(null);
           }}
         />
       </View>
-  <View style={styles.statsRow}>
-    <View style={styles.statBox}>
-      <Text style={styles.statLabel}>Durée</Text>
-      <Text style={styles.statValue}>{formatDuration(duration)}</Text>
-    </View>
-    <View style={styles.statBox}>
-      <Text style={styles.statLabel}>Distance</Text>
-      <Text style={styles.statValue}>
-        {distance < 1000
-          ? `${Math.round(distance)} m`
-          : `${(distance / 1000).toFixed(2)} km`}
-      </Text>
-    </View>
-    <View style={styles.statBox}>
-      <Text style={styles.statLabel}>Vitesse</Text>
-      <Text style={styles.statValue}>{speed.toFixed(1)} km/h</Text>
-    </View>
-  </View>
 
-  {!running ? (
-    <View style={styles.button}>
-      <Text style={styles.buttonText} onPress={startRun}>Démarrer</Text>
-    </View>
-  ) : paused ? (
-    <View style={styles.button}>
-      <Text style={styles.buttonText} onPress={startRun}>Reprendre</Text>
-    </View>
-  ) : (
-    <>
-      <View style={styles.button}>
-        <Text style={styles.buttonText} onPress={pauseRun}>Pause</Text>
+      <View style={styles.statsRow}>
+        <View style={[styles.statBox, { borderColor: cardBorder }]}>
+          <Text style={[styles.statLabel, { color: cardBorder }]}>Durée</Text>
+          <Text style={[styles.statValue, { color: textColor }]}>
+            {formatDuration(duration)}
+          </Text>
+        </View>
+        <View style={[styles.statBox, { borderColor: cardBorder }]}>
+          <Text style={[styles.statLabel, { color: cardBorder }]}>Distance</Text>
+          <Text style={[styles.statValue, { color: textColor }]}>
+            {distance < 1000
+              ? `${Math.round(distance)} m`
+              : `${(distance / 1000).toFixed(2)} km`}
+          </Text>
+        </View>
+        <View style={[styles.statBox, { borderColor: cardBorder }]}>
+          <Text style={[styles.statLabel, { color: cardBorder }]}>Vitesse</Text>
+          <Text style={[styles.statValue, { color: textColor }]}>
+            {speed.toFixed(1)} km/h
+          </Text>
+        </View>
       </View>
-      <View style={styles.button}>
-        <Text style={styles.buttonText} onPress={handleStop}>Terminer</Text>
-      </View>
-    </>
-  )}
-</View>
 
+      {!running ? (
+        <View style={styles.button}>
+          <Text style={styles.buttonText} onPress={startRun}>
+            Démarrer
+          </Text>
+        </View>
+      ) : paused ? (
+        <View style={styles.button}>
+          <Text style={styles.buttonText} onPress={startRun}>
+            Reprendre
+          </Text>
+        </View>
+      ) : (
+        <>
+          <View style={styles.button}>
+            <Text style={styles.buttonText} onPress={pauseRun}>
+              Pause
+            </Text>
+          </View>
+          <View style={styles.button}>
+            <Text style={styles.buttonText} onPress={handleStop}>
+              Terminer
+            </Text>
+          </View>
+        </>
+      )}
+    </View>
   </View>
 );
+
 
 
 }
@@ -431,14 +447,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#121212",
   },
   panel: {
-    backgroundColor: "#121212", // fond noir
     paddingVertical: 20,
     paddingHorizontal: 15,
     borderTopWidth: 1,
-    borderColor: "#333",
   },
   statsRow: {
     flexDirection: "row",
@@ -451,17 +464,14 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     marginHorizontal: 5,
     borderWidth: 2,
-    borderColor: "#f6b500",
     borderRadius: 8,
   },
   statLabel: {
-    color: "#f6b500",
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 5,
   },
   statValue: {
-    color: "white",
     fontSize: 20,
     fontWeight: "bold",
   },
@@ -478,8 +488,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button2: {
-    marginBottom:20,
-    
+    marginBottom: 20,
   },
 });
+
 

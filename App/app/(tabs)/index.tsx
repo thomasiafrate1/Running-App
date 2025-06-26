@@ -4,6 +4,7 @@ import MapView, { Polyline } from "react-native-maps";
 import { getToken } from "../../utils/token";
 import { useFocusEffect } from "@react-navigation/native";
 import { LineChart } from "react-native-chart-kit";
+import { useTheme } from "../../context/ThemeContext";
 
 
 
@@ -97,6 +98,14 @@ export default function HomeScreen() {
     stylers: [{ color: "#3d3d3d" }],
   },
 ];
+const { theme } = useTheme();
+const isDark = theme === "dark";
+
+const backgroundColor = isDark ? "#1c1c1c" : "#fff";
+const cardColor = isDark ? "#2c2c2c" : "#eee";
+const textColor = isDark ? "#fff" : "#1c1c1c";
+const borderColor = "#fdd835";
+
 
 
   const [dailyGoal, setDailyGoal] = useState<{
@@ -180,103 +189,116 @@ setWeeklyData(thisWeek);
 
 
   return (
-    <ScrollView style={styles.container}>
+  <ScrollView style={[styles.container, { backgroundColor }]}>
+    <Text style={[styles.title, { color: borderColor }]}>Tableau de bord</Text>
 
-      
-      <Text style={styles.title}>Tableau de bord</Text>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Mes statistiques</Text>
-        {stats ? (
-          <>
-            <Text style={styles.text}>Courses : {stats.totalCourses}</Text>
-            <Text style={styles.text}>
-  {" "}
-  {typeof stats.totalDistance === "number"
-    ? `${stats.totalDistance.toFixed(2)} km`
-    : "Distance inconnue"}{""}
-</Text>
+    {/* 📊 Stats */}
+    <View style={[styles.section, { backgroundColor: cardColor, borderColor }]}>
+      <Text style={[styles.sectionTitle, { color: borderColor }]}>Mes statistiques</Text>
+      {stats ? (
+        <>
+          <Text style={[styles.text, { color: textColor }]}>Courses : {stats.totalCourses}</Text>
+          <Text style={[styles.text, { color: textColor }]}>
+            {typeof stats.totalDistance === "number"
+              ? `${stats.totalDistance.toFixed(2)} km`
+              : "Distance inconnue"}
+          </Text>
+          <Text style={[styles.text, { color: textColor }]}>
+            Durée totale : {Math.round(stats.totalDuration / 60)} min
+          </Text>
+        </>
+      ) : (
+        <Text style={[styles.text, { color: textColor }]}>Chargement...</Text>
+      )}
+    </View>
 
-            <Text style={styles.text}>Durée total : {Math.round(stats.totalDuration / 60)} min</Text>
-          </>
-        ) : (
-          <Text>Chargement...</Text>
-        )}
+    {/* 🏃 Dernière course */}
+    <View style={[styles.section, { backgroundColor: cardColor, borderColor }]}>
+      <Text style={[styles.sectionTitle, { color: borderColor }]}>Dernière course</Text>
+      {lastCourse ? (
+        <>
+          <Text style={[styles.text, { color: textColor }]}>
+            {new Date(lastCourse.start_time).toLocaleString()}
+          </Text>
+          <Text style={[styles.text, { color: textColor }]}>
+            {lastCourse.distance.toFixed(2)} km en {formatDuration(lastCourse.duration)}
+          </Text>
+
+          {path.length > 1 ? (
+            <MapView
+              style={styles.map}
+              initialRegion={{
+                latitude: path[0].latitude,
+                longitude: path[0].longitude,
+                latitudeDelta: 0.002,
+                longitudeDelta: 0.002,
+              }}
+              scrollEnabled={false}
+              zoomEnabled={false}
+              customMapStyle={darkMapStyle}
+            >
+              <Polyline coordinates={path} strokeColor="#fdd835" strokeWidth={3} />
+            </MapView>
+          ) : (
+            <Text style={{ color: "gray" }}>Aucun tracé disponible</Text>
+          )}
+        </>
+      ) : (
+        <Text style={[styles.goalText, { color: textColor }]}>
+          Pas encore de course enregistrée
+        </Text>
+      )}
+    </View>
+
+    {/* 🎯 Objectif */}
+    {dailyGoal && (
+      <View style={[styles.goalContainer, { backgroundColor: cardColor, borderColor }]}>
+        <Text style={[styles.goalTitle, { color: borderColor }]}>Objectif du jour :</Text>
+        <Text style={[styles.goalText, { color: textColor }]}>
+          {dailyGoal.label}{" "}
+          <Text style={{ fontWeight: "bold" }}>
+            {dailyGoal.target} {dailyGoal.unit}
+          </Text>
+        </Text>
+        <Text
+          style={[
+            styles.goalStatus,
+            dailyGoal.completed ? styles.goalSuccess : styles.goalFail,
+          ]}
+        >
+          {dailyGoal.completed ? "✅ Objectif atteint !" : "❌ Pas encore atteint"}
+        </Text>
       </View>
+    )}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Dernière course</Text>
-        {lastCourse ? (
-          <>
-            <Text style={styles.text}>{new Date(lastCourse.start_time).toLocaleString()}</Text>
-            <Text style={styles.text}>{lastCourse.distance.toFixed(2)} km en {formatDuration(lastCourse.duration)}</Text>
-
-            {path.length > 1 ? (
-              <MapView
-                style={styles.map}
-                initialRegion={{
-                  latitude: path[0].latitude,
-                  longitude: path[0].longitude,
-                  latitudeDelta: 0.002,
-                  longitudeDelta: 0.002,
-                }}
-                scrollEnabled={false}
-                zoomEnabled={false}
-                customMapStyle={darkMapStyle}
-              >
-                <Polyline coordinates={path} strokeColor="#fdd835" strokeWidth={3} />
-              </MapView>
-            ) : (
-              <Text style={{ color: "gray" }}>Aucun tracé disponible</Text>
-            )}
-          </>
-        ) : (
-          <Text style={styles.goalText}>Pas encore de course enregistrée</Text>
-        )}
+    {/* 📈 Graph */}
+    {weeklyData.length > 0 && (
+      <View style={[styles.section, { backgroundColor: cardColor, borderColor }]}>
+        <Text style={[styles.sectionTitle, { color: borderColor }]}>Évolution</Text>
+        <LineChart
+          data={{
+            labels: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+            datasets: [{ data: weeklyData }],
+          }}
+          width={Dimensions.get("window").width - 80}
+          height={220}
+          yAxisSuffix=" km"
+          chartConfig={{
+            backgroundColor: backgroundColor,
+            backgroundGradientFrom: backgroundColor,
+            backgroundGradientTo: backgroundColor,
+            decimalPlaces: 1,
+            color: (opacity = 1) => `rgba(253, 216, 53, ${opacity})`,
+            labelColor: () => textColor,
+          }}
+          bezier
+          style={{ borderRadius: 10 }}
+        />
       </View>
-      {dailyGoal && (
-  <View style={styles.goalContainer}>
-    <Text style={styles.goalTitle}>Objectif du jour :</Text>
-    <Text style={styles.goalText}>
-      {dailyGoal.label} <Text style={{ fontWeight: "bold" }}>{dailyGoal.target} {dailyGoal.unit}</Text>
-    </Text>
-    <Text
-      style={[
-        styles.goalStatus,
-        dailyGoal.completed ? styles.goalSuccess : styles.goalFail,
-      ]}
-    >
-      {dailyGoal.completed ? "✅ Objectif atteint !" : "❌ Pas encore atteint"}
-    </Text>
-  </View>
-)}
-      {weeklyData.length > 0 && (
-  <View style={styles.section}>
-    <Text style={styles.sectionTitle}>Évolution</Text>
-    <LineChart
-      data={{
-        labels: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
-        datasets: [{ data: weeklyData }],
-      }}
-      width={Dimensions.get("window").width - 80}
-      height={220}
-      yAxisSuffix=" km"
-      chartConfig={{
-        backgroundColor: "#1c1c1c",
-        backgroundGradientFrom: "#2c2c2c",
-        backgroundGradientTo: "#2c2c2c",
-        decimalPlaces: 1,
-        color: (opacity = 1) => `rgba(253, 216, 53, ${opacity})`,
-        labelColor: () => "#fff",
-      }}
-      bezier
-      style={{ borderRadius: 10}}
-    />
-  </View>
-)}
+    )}
+  </ScrollView>
+);
 
-
-    </ScrollView>
-  );
 }
 
 const styles = StyleSheet.create({

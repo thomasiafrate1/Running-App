@@ -13,6 +13,8 @@ import {
 import MapView, { Polyline } from "react-native-maps";
 import { getToken } from "../../utils/token";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../../context/ThemeContext";
+
 
 type PathPoint = { latitude: number; longitude: number };
 
@@ -91,6 +93,8 @@ const darkMapStyle = [
 ];
 
 
+
+
 function formatDurationParts(seconds: number): { value: string; unit: string } {
   if (seconds < 60) {
     return { value: `${seconds}`, unit: "s" };
@@ -106,6 +110,14 @@ export default function HistoryScreen() {
   const [viewMode, setViewMode] = useState<"mine" | "recent">("mine");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { theme } = useTheme();
+const isDark = theme === "dark";
+
+const backgroundColor = isDark ? "#1c1c1c" : "#fff";
+const cardColor = isDark ? "#2b2b2b" : "#f4f4f4";
+const textColor = isDark ? "#fff" : "#1c1c1c";
+const accent = "#fdd835";
+const borderColor = accent;
 
   const fetchCourses = async () => {
     setLoading(true);
@@ -147,7 +159,7 @@ export default function HistoryScreen() {
   <Text style={styles.dateText}>
         {new Date(item.start_time).toLocaleString()}
     </Text>
-        <View style={styles.courseRow}>
+        <View style={[styles.courseRow, { backgroundColor: cardColor, borderColor }]}>
               
   {path.length > 1 ? (
     
@@ -189,20 +201,20 @@ export default function HistoryScreen() {
         <Text style={{ color: "#999", fontSize: 10 }}>?</Text>
       </View>
     )}
-    <Text style={styles.emailText}>{item.email}</Text>
+    <Text style={[styles.emailText, { color: "#f6b500" }]}>{item.email}</Text>
   </View>
 )}
 
     <View style={styles.testCourseRow}>
-      <Text style={styles.infoText}>
-        {item.distance.toFixed(2)} <Text style={{color : "white"}}>km</Text>
+      <Text style={[styles.infoText, { color: "#f6b500" }]}>
+        {item.distance.toFixed(2)} <Text style={{color : textColor}}>km</Text>
       </Text>
       {(() => {
   const { value, unit } = formatDurationParts(item.duration);
   return (
-    <Text style={styles.infoText}>
+    <Text style={[styles.infoText, { color: "#f6b500" }]}>
       {value}
-      <Text style={{ color: "white" }}> {unit}</Text>
+      <Text style={{ color: textColor }}> {unit}</Text>
     </Text>
   );
 })()}
@@ -212,7 +224,7 @@ export default function HistoryScreen() {
     {item.avg_speed != null && (
     <View style={styles.row}>
       <Text style={styles.infoText}>
-        {item.avg_speed.toFixed(2)} <Text style={{ color: "white" }}>km/h</Text>
+        {item.avg_speed.toFixed(2)} <Text style={{ color: textColor }}>km/h</Text>
       </Text>
     </View>
     
@@ -220,11 +232,11 @@ export default function HistoryScreen() {
   <View style={styles.row2}>
   <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
     <Ionicons name="heart" size={18} color="#fdd835" />
-    <Text style={{ color: "#fff" }}>{item.likeCount || 0}</Text>
+    <Text style={{ color: textColor }}>{item.likeCount || 0}</Text>
   </View>
   <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
     <Ionicons name="chatbubble-ellipses" size={18} color="#fdd835" />
-    <Text style={{ color: "#fff" }}>{item.commentCount || 0}</Text>
+    <Text style={{ color: textColor }}>{item.commentCount || 0}</Text>
   </View>
 </View>
 
@@ -239,39 +251,38 @@ export default function HistoryScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Historique des courses</Text>
+  <View style={[styles.container, { backgroundColor }]}>
+    <Text style={[styles.title, { color: borderColor }]}>Historique des courses</Text>
 
-      <View style={styles.buttonRow}>
-        <Button
-          title="Mes courses"
-          onPress={() => setViewMode("mine")}
-          color={viewMode === "mine" ? "#f6b500" : "gray"}
-        />
-        <Button
-          title="Dernières courses"
-          onPress={() => setViewMode("recent")}
-          color={viewMode === "recent" ? "#f6b500" : "gray"}
-          
-        />
-      </View>
-
-      {loading ? (
-  <Text style={styles.loading}>Chargement...</Text>
-) : courses.length === 0 ? (
-  <Text style={styles.loading}>
-    {viewMode === "mine" ? "Aucune course effectuée." : "Aucune course à afficher."}
-  </Text>
-) : (
-  <FlatList
-    data={courses}
-    keyExtractor={(item) => item.id.toString()}
-    renderItem={renderItem}
-  />
-)}
-
+    <View style={styles.buttonRow}>
+      <Button
+        title="Mes courses"
+        onPress={() => setViewMode("mine")}
+        color={viewMode === "mine" ? "#f6b500" : "gray"}
+      />
+      <Button
+        title="Dernières courses"
+        onPress={() => setViewMode("recent")}
+        color={viewMode === "recent" ? "#f6b500" : "gray"}
+      />
     </View>
-  );
+
+    {loading ? (
+      <Text style={[styles.loading, { color: textColor }]}>Chargement...</Text>
+    ) : courses.length === 0 ? (
+      <Text style={[styles.loading, { color: textColor }]}>
+        {viewMode === "mine" ? "Aucune course effectuée." : "Aucune course à afficher."}
+      </Text>
+    ) : (
+      <FlatList
+        data={courses}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderItem}
+      />
+    )}
+  </View>
+);
+
 }
 
 const styles = StyleSheet.create({
@@ -306,7 +317,7 @@ avatarWrapper: {
   borderRadius: 15,
   overflow: "hidden",
   borderWidth: 1,
-  borderColor: "#fdd835",
+  borderColor: "#f6b500",
 },
 avatar: {
   width: "100%",
@@ -343,8 +354,8 @@ avatarPlaceholder: {
     backgroundColor: "#2b2b2b",
     borderRadius: 0,
     marginBottom: 15,
-    borderTopColor: "#fdd835",
-    borderBottomColor: "#fdd835",
+    borderTopColor: "#f6b500",
+    borderBottomColor: "#f6b500",
     borderWidth: 1,
     overflow: "hidden",
     height: 125,
@@ -400,7 +411,7 @@ row2: {
 
   },
   emailText: {
-    color: "#fdd835",
+    color: "#f6b500",
     fontSize: 17,
     fontStyle: "italic",
     fontWeight:"bold"
