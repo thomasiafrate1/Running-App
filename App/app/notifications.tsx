@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { getToken } from "../utils/token";
 import { useTheme } from "../context/ThemeContext";
+import BackButton from "../components/BackButton";
 
 type Notification = {
   id: number;
@@ -43,7 +44,8 @@ export default function NotificationsScreen() {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: bgColor }]}>
-      <Text style={[styles.title, { color: titleColor }]}>🔔 Notifications</Text>
+      <BackButton/>
+      <Text style={[styles.title, { color: titleColor, marginTop: 43 }]}> Notifications</Text>
       <Text style={[styles.subtitle, { color: subtitleColor }]}>
         Vous avez {notifications.length} notifications :
       </Text>

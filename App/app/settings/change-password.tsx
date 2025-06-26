@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from "reac
 import { getToken } from "../../utils/token";
 import { useRouter } from "expo-router";
 import { useTheme } from "../../context/ThemeContext";
+import BackButton from "../../components/BackButton";
 
 export default function ChangePasswordScreen() {
   const [password, setPassword] = useState("");
@@ -57,6 +58,7 @@ export default function ChangePasswordScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
+      <BackButton/>
       <Text style={[styles.title, { color: "#fdd835" }]}>Mot de passe actuel</Text>
       <TextInput
         style={[styles.input, { backgroundColor: inputBg, color: inputText }]}

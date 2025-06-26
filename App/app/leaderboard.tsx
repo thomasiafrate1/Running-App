@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { getToken } from "../utils/token";
 import { useTheme } from "../context/ThemeContext";
+import BackButton from "../components/BackButton";
+import AnimatedMapRegion from "react-native-maps/lib/AnimatedRegion";
 
 type User = {
   id: number;
@@ -62,8 +64,9 @@ export default function LeaderboardScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Text style={[styles.title, { color: isDark ? "#fdd835" : "#333" }]}>
-        🏆 Leaderboard
+      <BackButton/>
+      <Text style={[styles.title, { color: isDark ? "#fdd835" : "#333", marginTop : 30}]}>
+        Classement
       </Text>
       <FlatList
         data={leaderboard}

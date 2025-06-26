@@ -10,6 +10,7 @@ import {
 import { getToken } from "../../utils/token";
 import { useRouter } from "expo-router";
 import { useTheme } from "../../context/ThemeContext";
+import BackButton from "../../components/BackButton";
 
 export default function ChangeEmailScreen() {
   const [newEmail, setNewEmail] = useState("");
@@ -58,6 +59,7 @@ export default function ChangeEmailScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
+      <BackButton/>
       <Text style={[styles.title, { color: "#fdd835" }]}>Changer mon email</Text>
 
       <TextInput

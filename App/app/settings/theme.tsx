@@ -3,6 +3,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
+import BackButton from "../../components/BackButton";
 
 export default function ThemeScreen() {
   const { theme, toggleTheme } = useTheme();
@@ -11,6 +12,7 @@ export default function ThemeScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: isDark ? "#1c1c1c" : "#f5f5f5" }]}>
+      <BackButton/>
       <Text style={[styles.title, { color: isDark ? "#fff" : "#1c1c1c" }]}>
         Thème actuel : {isDark ? "Sombre 🌙" : "Clair ☀️"}
       </Text>

@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-nati
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTheme } from "../../context/ThemeContext";
+import BackButton from "../../components/BackButton";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -25,7 +26,8 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor }]}>
-      <Text style={[styles.title, { color: sectionColor }]}>Paramètres</Text>
+      <BackButton/>
+      <Text style={[styles.title, { color: sectionColor, marginTop : 43 }]}>Paramètres</Text>
 
       <Text style={[styles.section, { color: sectionColor }]}>Compte & Sécurité</Text>
       <Item icon="key-outline" label="Changer le mot de passe" path="/settings/change-password" />
@@ -34,10 +36,8 @@ export default function SettingsScreen() {
 
       <Text style={[styles.section, { color: sectionColor }]}>Apparence</Text>
       <Item icon="color-palette-outline" label="Thème" path="/settings/theme" />
-      <Item icon="language-outline" label="Langue" path="/settings/language" />
 
       <Text style={[styles.section, { color: sectionColor }]}>Support & Infos</Text>
-      <Item icon="notifications-outline" label="Notifications" path="/settings/notifications" />
       <Item icon="chatbubble-ellipses-outline" label="Donner un avis" path="/settings/feedback" />
       <Item icon="information-circle-outline" label="À propos" path="/settings/about" />
     </ScrollView>

@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { getToken, removeToken } from "../../utils/token";
 import { useRouter } from "expo-router";
 import { useTheme } from "../../context/ThemeContext";
+import BackButton from "../../components/BackButton";
 
 export default function DeleteAccountScreen() {
   const router = useRouter();
@@ -49,6 +50,7 @@ export default function DeleteAccountScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
+      <BackButton/>
       <Text style={[styles.title, { color: "#f44336" }]}>Supprimer mon compte</Text>
       <TouchableOpacity style={styles.deleteButton} onPress={confirmDelete}>
         <Text style={styles.deleteText}>Supprimer définitivement</Text>

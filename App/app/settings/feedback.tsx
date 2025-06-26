@@ -10,6 +10,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { getToken } from "../../utils/token";
 import { useTheme } from "../../context/ThemeContext";
+import BackButton from "../../components/BackButton";
 
 export default function FeedbackScreen() {
   const [feedback, setFeedback] = useState("");
@@ -55,6 +56,7 @@ export default function FeedbackScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
+        <BackButton/>
       <Text style={[styles.title, { color: textColor }]}>🗨️ Donner un avis</Text>
 
       <View style={styles.starsRow}>

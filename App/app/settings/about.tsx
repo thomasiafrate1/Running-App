@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, ScrollView, Linking } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
+import BackButton from "../../components/BackButton";
 
 export default function AboutScreen() {
   const { theme } = useTheme();
@@ -12,6 +13,7 @@ export default function AboutScreen() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor }} contentContainerStyle={styles.container}>
+        <BackButton/>
       <Text style={[styles.title, { color: accent }]}>À propos</Text>
 
       <Text style={[styles.text, { color: textColor }]}>
