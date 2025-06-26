@@ -14,7 +14,7 @@ export default function AboutScreen() {
   return (
     <ScrollView style={{ flex: 1, backgroundColor }} contentContainerStyle={styles.container}>
         <BackButton/>
-      <Text style={[styles.title, { color: accent }]}>À propos</Text>
+      <Text style={[styles.title, { color: accent, marginTop:22 }]}>À propos</Text>
 
       <Text style={[styles.text, { color: textColor }]}>
         Cette application a été conçue pour suivre vos courses, vos progrès, et atteindre vos objectifs sportifs. 
