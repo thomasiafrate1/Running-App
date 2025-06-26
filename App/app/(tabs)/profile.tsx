@@ -195,6 +195,7 @@ if (Array.isArray(data)) {
 
   return (
   <View style={[styles.container, { backgroundColor }]}>
+    
     <View style={styles.logoutIconWrapper}>
       <TouchableOpacity
         onPress={() =>
@@ -208,7 +209,7 @@ if (Array.isArray(data)) {
       </TouchableOpacity>
     </View>
 
-    <Text style={[styles.title, { color: borderColor }]}>Profil</Text>
+    <Text style={[styles.title, { color: borderColor, marginTop:20}]}>Profil</Text>
 
     {user && (
       <View style={styles.userBox}>

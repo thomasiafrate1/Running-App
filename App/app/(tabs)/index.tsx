@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback  } from "react";
-import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Dimensions, Image } from "react-native";
 import MapView, { Polyline } from "react-native-maps";
 import { getToken } from "../../utils/token";
 import { useFocusEffect } from "@react-navigation/native";
@@ -7,7 +7,9 @@ import { LineChart } from "react-native-chart-kit";
 import { useTheme } from "../../context/ThemeContext";
 
 
-
+type User = {
+  username: string;
+}
 
 type Course = {
   id: number;
@@ -35,6 +37,7 @@ function formatDuration(seconds: number): string {
 
 export default function HomeScreen() {
   const [lastCourse, setLastCourse] = useState<Course | null>(null);
+  const [user, setUser] = useState(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
   const [weeklyData, setWeeklyData] = useState<number[]>([]);
@@ -115,6 +118,20 @@ const borderColor = "#fdd835";
   completed: boolean;
 } | null>(null);
 
+useEffect(() => {
+  const fetchUser = async () => {
+    const token = await getToken();
+    const res = await fetch("http://192.168.1.42:3000/api/auth/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    setUser(data.user);
+  };
+
+  fetchUser();
+}, []);
+
+
 useFocusEffect(
   useCallback(() => {
     const fetchData = async () => {
@@ -190,7 +207,17 @@ setWeeklyData(thisWeek);
 
   return (
   <ScrollView style={[styles.container, { backgroundColor }]}>
-    <Text style={[styles.title, { color: borderColor }]}>Tableau de bord</Text>
+    <View style={styles.backgroundDecor}>
+    <View style={styles.stripe1} />
+    <View style={[styles.stripe2, { top: 200 }]} />
+    <View style={[styles.stripe3, { top: 400 }]} />
+    <View style={[styles.stripe4, { top: 600 }]} />
+    <View style={[styles.stripe5, { top: 800 }]} />
+  </View>
+  <Image source={require("../../assets/images/logoRunYnov.png")} style={styles.logo} />
+    <Text style={[styles.welcome,{color : textColor }]}>Bienvenue {user?.username} !</Text>
+
+
 
     {/* 📊 Stats */}
     <View style={[styles.section, { backgroundColor: cardColor, borderColor }]}>
@@ -324,6 +351,61 @@ const styles = StyleSheet.create({
     borderWidth: 1,
 
   },
+  backgroundDecor: {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  zIndex: -1,
+},
+
+stripe1: {
+  position: "absolute",
+  width: "150%",
+  height: 100,
+  backgroundColor: "#fdd835",
+  transform: [{ rotate: "-5deg" }],
+  opacity: 0.05, // pour ne pas trop gêner le texte
+  left: -50,
+},
+stripe2: {
+  position: "absolute",
+  width: "150%",
+  height: 100,
+  backgroundColor: "#fdd835",
+  transform: [{ rotate: "10deg" }],
+  opacity: 0.05, // pour ne pas trop gêner le texte
+  left: -50,
+},
+stripe3: {
+  position: "absolute",
+  width: "150%",
+  height: 100,
+  backgroundColor: "#fdd835",
+  transform: [{ rotate: "-5deg" }],
+  opacity: 0.05, // pour ne pas trop gêner le texte
+  left: -50,
+},
+stripe4: {
+  position: "absolute",
+  width: "150%",
+  height: 100,
+  backgroundColor: "#fdd835",
+  transform: [{ rotate: "18deg" }],
+  opacity: 0.05, // pour ne pas trop gêner le texte
+  left: -50,
+},
+stripe5: {
+  position: "absolute",
+  width: "150%",
+  height: 100,
+  backgroundColor: "#fdd835",
+  transform: [{ rotate: "-5deg" }],
+  opacity: 0.05, // pour ne pas trop gêner le texte
+  left: -50,
+},
+
   sectionTitle: {
     fontSize: 18,
     color: "#fdd835",
@@ -370,6 +452,22 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 12,
   },
+  welcome: {
+  fontSize: 20,
+  fontWeight: "bold",
+  color: "#fdd835",
+  textAlign: "center",
+  marginBottom: 12,
+},
+
+logo: {
+  width: 80,
+  height: 80,
+  resizeMode: "contain",
+  alignSelf: "center",
+  marginBottom: 20,
+},
+
 });
 
 

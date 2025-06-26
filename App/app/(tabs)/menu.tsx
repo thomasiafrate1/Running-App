@@ -14,7 +14,7 @@ export default function MenuScreen() {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor }]}>
-      <Text style={[styles.title, { color: "#fdd835" }]}>☰ Menu</Text>
+      <Text style={[styles.title, { color: "#fdd835", textAlign: "center", marginTop:13 }]}> Menu</Text>
 
       <TouchableOpacity
         style={[styles.item, { backgroundColor: itemBg }]}

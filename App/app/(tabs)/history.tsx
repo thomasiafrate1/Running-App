@@ -252,7 +252,8 @@ const borderColor = accent;
 
   return (
   <View style={[styles.container, { backgroundColor }]}>
-    <Text style={[styles.title, { color: borderColor }]}>Historique des courses</Text>
+    
+    <Text style={[styles.title, { color: borderColor, marginTop:20 }]}>Historique des courses</Text>
 
     <View style={styles.buttonRow}>
       <Button
