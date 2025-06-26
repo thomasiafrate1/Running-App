@@ -19,6 +19,7 @@ app.use("/api/admin", require("./routes/admin"));
 app.use("/api/notifications", require("./routes/notifications"));
 app.use("/api/admin/goals", adminGoalsRoutes);
 app.use("/api/leaderboard", require("./routes/leaderboard"));
+app.use("/api/feedback", require("./routes/feedback"));
 
 const interactionRoutes = require("./routes/interactions");
 app.use("/api/interactions", interactionRoutes);
