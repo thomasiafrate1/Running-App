@@ -209,10 +209,9 @@ setWeeklyData(thisWeek);
   <ScrollView style={[styles.container, { backgroundColor }]}>
     <View style={styles.backgroundDecor}>
     <View style={styles.stripe1} />
-    <View style={[styles.stripe2, { top: 200 }]} />
-    <View style={[styles.stripe3, { top: 400 }]} />
-    <View style={[styles.stripe4, { top: 600 }]} />
-    <View style={[styles.stripe5, { top: 800 }]} />
+    <View style={[styles.stripe2, { top: 300 }]} />
+    <View style={[styles.stripe3, { top: 600 }]} />
+
   </View>
   <Image source={require("../../assets/images/logoRunYnov.png")} style={styles.logo} />
     <Text style={[styles.welcome,{color : textColor }]}>Bienvenue {user?.username} !</Text>
@@ -387,24 +386,7 @@ stripe3: {
   opacity: 0.05, // pour ne pas trop gêner le texte
   left: -50,
 },
-stripe4: {
-  position: "absolute",
-  width: "150%",
-  height: 100,
-  backgroundColor: "#fdd835",
-  transform: [{ rotate: "18deg" }],
-  opacity: 0.05, // pour ne pas trop gêner le texte
-  left: -50,
-},
-stripe5: {
-  position: "absolute",
-  width: "150%",
-  height: 100,
-  backgroundColor: "#fdd835",
-  transform: [{ rotate: "-5deg" }],
-  opacity: 0.05, // pour ne pas trop gêner le texte
-  left: -50,
-},
+
 
   sectionTitle: {
     fontSize: 18,
