@@ -229,41 +229,55 @@ if (Array.isArray(data)) {
       </View>
     )}
 
-    {stats && (
-      <>
-        <View style={styles.statsContainer}>
-          <View style={[styles.statBox, { backgroundColor: cardColor, borderColor }]}>
-            <Text style={[styles.statValue, { color: borderColor }]}>{stats.totalCourses}</Text>
-            <Text style={[styles.statLabel, { color: textColor }]}>Courses</Text>
-          </View>
-          <View style={[styles.statBox, { backgroundColor: cardColor, borderColor }]}>
-            <Text style={[styles.statValue, { color: borderColor }]}>
-              {stats.totalDistance.toFixed(2)} km
-            </Text>
-            <Text style={[styles.statLabel, { color: textColor }]}>Distance</Text>
-          </View>
-          <View style={[styles.statBox, { backgroundColor: cardColor, borderColor }]}>
-            <Text style={[styles.statValue, { color: borderColor }]}>
-              {Math.round(stats.totalDuration / 60)} min
-            </Text>
-            <Text style={[styles.statLabel, { color: textColor }]}>Temps total</Text>
-          </View>
-          <View style={[styles.statBox, { backgroundColor: cardColor, borderColor }]}>
-            <Text style={[styles.statValue, { color: borderColor }]}>
-              {stats.avgSpeed != null ? stats.avgSpeed.toFixed(2) : "N/A"} km/h
-            </Text>
-            <Text style={[styles.statLabel, { color: textColor }]}>Vitesse moy.</Text>
-          </View>
-        </View>
+    {stats ? (
+  <>
+    <View style={styles.statsContainer}>
+      <View style={[styles.statBox, { backgroundColor: cardColor, borderColor }]}>
+        <Text style={[styles.statLabel, { color: textColor }]}>Courses</Text>
+        <Text style={[styles.statValue, { color: borderColor }]}>
+          {stats.totalCourses ?? 0}
+        </Text>
+        
+      </View>
 
-        <View style={styles.goalSection}>
-          <Text style={[styles.subTitle, { color: borderColor }]}>Objectifs Accomplis</Text>
-          <Text style={[styles.goalSummary, { color: textColor }]}>
-            {goalHistory?.filter((g) => g.completed).length ?? 0}
-          </Text>
-        </View>
-      </>
-    )}
+      <View style={[styles.statBox, { backgroundColor: cardColor, borderColor }]}>
+        <Text style={[styles.statLabel, { color: textColor }]}>Distance</Text>
+        <Text style={[styles.statValue, { color: borderColor }]}>
+          {typeof stats.totalDistance === "number" ? `${stats.totalDistance.toFixed(2)} km` : "0"}
+        </Text>
+        
+      </View>
+
+      <View style={[styles.statBox, { backgroundColor: cardColor, borderColor }]}>
+        <Text style={[styles.statLabel, { color: textColor }]}>Temps total</Text>
+        <Text style={[styles.statValue, { color: borderColor }]}>
+          {typeof stats.totalDuration === "number" ? `${Math.round(stats.totalDuration / 60)} min` : "0"}
+        </Text>
+        
+      </View>
+
+      <View style={[styles.statBox, { backgroundColor: cardColor, borderColor }]}>
+        <Text style={[styles.statLabel, { color: textColor }]}>Vitesse moy.</Text>
+        <Text style={[styles.statValue, { color: borderColor }]}>
+          {typeof stats.avgSpeed === "number" ? `${stats.avgSpeed.toFixed(2)} km/h` : "0"}
+        </Text>
+        
+      </View>
+    </View>
+
+    <View style={styles.goalSection}>
+      <Text style={[styles.subTitle, { color: borderColor }]}>Objectifs Accomplis</Text>
+      <Text style={[styles.goalSummary, { color: textColor }]}>
+        {goalHistory?.filter((g) => g.completed).length ?? 0}
+      </Text>
+    </View>
+  </>
+) : (
+  <Text style={[styles.goalSummary, { color: textColor, marginTop: 20 }]}>
+    Aucune donnée disponible
+  </Text>
+)}
+
   </View>
 );
 
