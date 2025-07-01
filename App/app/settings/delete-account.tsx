@@ -44,7 +44,7 @@ export default function DeleteAccountScreen() {
           onPress: async () => {
             const token = await getToken();
             try {
-              const res = await fetch("http://192.168.1.42:3000/api/auth/delete-account", {
+              const res = await fetch("http://10.15.6.135:3000/api/auth/delete-account", {
                 method: "DELETE",
                 headers: {
                   "Content-Type": "application/json",

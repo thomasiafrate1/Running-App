@@ -341,15 +341,7 @@ return (
         <Text style={{ color: textColor, marginLeft: 10 }}>{likeCount} j’aime</Text>
       </TouchableOpacity>
 
-      {/* 🚀 Mode Défi (si c'est sa propre course) */}
-        {user?.id === course.user_id && (
-          <TouchableOpacity
-            style={{ backgroundColor: "#fdd835", padding: 12, borderRadius: 10, alignItems: "center", marginBottom: 20 }}
-            onPress={() => setShowModal(true)}
-          >
-            <Text style={{ fontWeight: "bold" }}>🎯 Refaire cette course en mode défi</Text>
-          </TouchableOpacity>
-        )}
+
 
         {/* Modal */}
         <Modal visible={showModal} transparent animationType="slide">
@@ -378,16 +370,30 @@ return (
       {/* 💬 Commentaires */}
       <Text style={[styles.infoText, { fontSize: 20, marginTop: 10, color: textColor }]}>Commentaires</Text>
 
-      {comments.map((comment, index) => (
-        <View key={index} style={{ backgroundColor: inputBg, padding: 10, borderRadius: 8, marginVertical: 5 }}>
-  <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-    <Text style={{ color: textColor, fontWeight: "bold" }}>{comment.username}</Text>
-    <Text style={{ color: "#999", fontSize: 12 }}>{new Date(comment.created_at).toLocaleString()}</Text>
-  </View>
-  <Text style={{ color: textColor, marginTop: 5 }}>{comment.content}</Text>
-</View>
+      {comments.map((comment, index) => {
+  const isOwnComment = comment.username === user?.username;
 
-      ))}
+  return (
+    <View
+      key={index}
+      style={{
+        alignSelf: isOwnComment ? "flex-end" : "flex-start",
+        backgroundColor: isOwnComment ? "#333" : "#444",
+        padding: 10,
+        borderRadius: 10,
+        marginVertical: 6,
+        maxWidth: "80%",
+      }}
+    >
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Text style={{ color: "#fdd835", fontWeight: "bold" }}>{comment.username}</Text>
+        <Text style={{ color: "#aaa", fontSize: 10 }}>{new Date(comment.created_at).toLocaleString()}</Text>
+      </View>
+      <Text style={{ color: "white", marginTop: 5 }}>{comment.content}</Text>
+    </View>
+  );
+})}
+
 
       {/* ➕ Nouveau commentaire */}
       <View
@@ -413,18 +419,49 @@ return (
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
-  onPress={handleShare}
+        <View
   style={{
-    backgroundColor: "#fdd835",
-    padding: 12,
-    borderRadius: 10,
-    alignItems: "center",
-    marginVertical: 10,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 20,
+    marginTop: 20,
+    marginBottom: 40,
   }}
 >
-  <Text style={{ fontWeight: "bold" }}>📤 Partager cette course</Text>
-</TouchableOpacity>
+  {/* Mode Défi */}
+  {user?.id === course.user_id && (
+    <TouchableOpacity
+      style={{
+        backgroundColor: "#fdd835",
+        padding: 12,
+        borderRadius: 50,
+        width: 50,
+        height: 50,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+      onPress={() => setShowModal(true)}
+    >
+      <Ionicons name="flag-outline" size={24} color="#1c1c1c" />
+    </TouchableOpacity>
+  )}
+
+  {/* Partager */}
+  <TouchableOpacity
+    style={{
+      backgroundColor: "#fdd835",
+      padding: 12,
+      borderRadius: 50,
+      width: 50,
+      height: 50,
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+    onPress={handleShare}
+  >
+    <Ionicons name="share-social" size={24} color="#1c1c1c" />
+  </TouchableOpacity>
+</View>
 
 <View style={{ position: "absolute", top: -1000 }} ref={shareViewRef} collapsable={false}>
   <ShareCard

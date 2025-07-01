@@ -31,7 +31,7 @@ export default function FeedbackScreen() {
     const token = await getToken();
 
     try {
-      const res = await fetch("http://192.168.1.42:3000/api/feedback", {
+      const res = await fetch("http://10.15.6.135:3000/api/feedback", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

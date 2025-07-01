@@ -32,7 +32,7 @@ export default function ChangeEmailScreen() {
     const token = await getToken();
 
     try {
-      const res = await fetch("http://192.168.1.42:3000/api/auth/change-email", {
+      const res = await fetch("http://10.15.6.135:3000/api/auth/change-email", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -50,6 +50,7 @@ export default function AboutScreen() {
       <Text style={[styles.footer, { color: secondary }]}>
         © {new Date().getFullYear()} Running App - Tous droits réservés.
       </Text>
+      
     </ScrollView>
   );
 }
