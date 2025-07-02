@@ -36,7 +36,7 @@ export default function LeaderboardScreen() {
     const fetchLeaderboard = async () => {
       const token = await getToken();
       try {
-        const res = await fetch("http://10.15.6.135:3000/api/leaderboard", {
+        const res = await fetch("http://10.188.218.47:3000/api/leaderboard", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

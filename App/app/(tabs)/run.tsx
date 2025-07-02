@@ -268,7 +268,7 @@ const startRun = () => {
 
     const token = await getToken();
 
-    await fetch("http://10.15.6.135:3000/api/courses", {
+    await fetch("http://10.188.218.47:3000/api/courses", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -288,7 +288,7 @@ const startRun = () => {
     Alert.alert("Course enregistrée !");
     if (distance / 1000 >= 2) { // ✔️ tu peux ajuster ce seuil selon ton objectif
   try {
-    await fetch("http://10.15.6.135:3000/api/goals/complete", {
+    await fetch("http://10.188.218.47:3000/api/goals/complete", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

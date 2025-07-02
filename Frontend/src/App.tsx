@@ -9,6 +9,8 @@ import GoalTemplateAdmin from "./pages/GoalsAdmin";
 import RecentLogins from "./pages/RecentLogins";
 import AdminNotifications from "./pages/Notifications";
 import LeaderboardAdmin from "./pages/LeaderboardAdmin";
+import Feedbacks from "./pages/Feedbacks";
+import CommentsAdmin from "./pages/CommentsAdmin";
 
 
 
@@ -26,6 +28,8 @@ export default function App() {
         <Route path="/goals" element={<GoalTemplateAdmin />} />
         <Route path="/notifications" element={<AdminNotifications />} />
         <Route path="/leaderboard" element={<LeaderboardAdmin />} />
+        <Route path="/feedbacks" element={<Feedbacks />} />
+        <Route path="/comments" element={<CommentsAdmin />} />
 
       </Routes>
     </BrowserRouter>

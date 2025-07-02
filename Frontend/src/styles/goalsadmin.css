@@ -1,5 +1,6 @@
 /* Conteneur général */
 .goal-template-container {
+  margin-left: 250px;
   padding: 2rem;
   max-width: 900px;
   margin: 0 auto;

@@ -53,6 +53,16 @@ export default function Navbar() {
   Notifications
 </NavLink>
         </li>
+        <li>
+          <NavLink to="/feedbacks" className={({ isActive }) => isActive ? "active" : ""}>
+  Avis
+</NavLink>
+        </li>
+        <li>
+          <NavLink to="/comments" className={({ isActive }) => isActive ? "active" : ""}>
+  Commentaires
+</NavLink>
+        </li>
       </ul>
     </nav>
   );

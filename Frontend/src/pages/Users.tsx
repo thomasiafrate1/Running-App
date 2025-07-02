@@ -7,15 +7,27 @@ type User = {
   id: number;
   email: string;
   role: string;
+  username: string;
+  verified: string;
 };
 
 export default function Users() {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState("");
+  const [sortBy, setSortBy] = useState("recent");
+  const [search, setSearch] = useState("");
+const filteredUsers = users.filter((u) =>
+  u.username.toLowerCase().includes(search.toLowerCase()) ||
+  u.email.toLowerCase().includes(search.toLowerCase())
+);
+
+
 
   const navigate = useNavigate();
 
 const handleDelete = async (id: number) => {
+
+  
   if (!window.confirm("Confirmer suppression ?")) return;
   const token = localStorage.getItem("token");
   await fetch(`http://localhost:3000/api/admin/users/${id}`, {
@@ -24,6 +36,8 @@ const handleDelete = async (id: number) => {
   });
   setUsers(users.filter(u => u.id !== id));
 };
+
+
 
 const toggleRole = async (id: number, currentRole: string) => {
   const newRole = currentRole === "admin" ? "user" : "admin";
@@ -41,7 +55,7 @@ const toggleRole = async (id: number, currentRole: string) => {
   setUsers(users.map(u => u.id === id ? { ...u, role: newRole } : u));
 };
 
-
+  
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -56,14 +70,22 @@ const toggleRole = async (id: number, currentRole: string) => {
           setError("Erreur chargement utilisateurs");
           return;
         }
+        if (sortBy === "alpha") {
+          data.sort((a: User, b: User) => a.username.localeCompare(b.username));
+        } else {
+          data.sort((a: User, b: User) => b.id - a.id);
+        }
         setUsers(data);
+
       } catch (err) {
         setError("Erreur serveur");
       }
     };
+    
 
     fetchUsers();
   }, []);
+  
 
   return (
     <>
@@ -72,21 +94,41 @@ const toggleRole = async (id: number, currentRole: string) => {
       
       <h2 className="page-title">Gestion des utilisateurs</h2>
       {error && <p className="error">{error}</p>}
+      <div className="user-controls">
+  <input
+    type="text"
+    placeholder="🔍 Rechercher..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    className="search-input"
+  />
+
+    
+
+
+</div>
+
+
+
 
       <table className="user-table">
         <thead>
           <tr>
             <th>ID</th>
+            <th>Nom</th>
             <th>Email</th>
+            <th>Vérifié</th>
             <th>Rôle</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {users.map((u) => (
+          {filteredUsers.map((u) => (
             <tr key={u.id}>
               <td>{u.id}</td>
-              <td>{u.email}</td>
+              <td>{u.username}</td>
+                            <td>{u.email}</td>
+              <td>{u.verified ? "✅" : "❌"}</td>
               <td>{u.role}</td>
               <td className="actions">
                 <button onClick={() => toggleRole(u.id, u.role)} className="btn btn-secondary">

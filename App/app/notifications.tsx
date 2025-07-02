@@ -26,7 +26,7 @@ export default function NotificationsScreen() {
     const fetchNotifications = async () => {
       const token = await getToken();
       try {
-        const res = await fetch("http://10.15.6.135:3000/api/notifications", {
+        const res = await fetch("http://10.188.218.47:3000/api/notifications", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

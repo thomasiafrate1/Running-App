@@ -121,7 +121,7 @@ const borderColor = "#fdd835";
 useEffect(() => {
   const fetchUser = async () => {
     const token = await getToken();
-    const res = await fetch("http://10.15.6.135:3000/api/auth/me", {
+    const res = await fetch("http://10.188.218.47:3000/api/auth/me", {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
@@ -138,13 +138,13 @@ useFocusEffect(
       const token = await getToken();
 
       try {
-        const resStats = await fetch(`http://10.15.6.135:3000/api/courses/stats`, {
+        const resStats = await fetch(`http://10.188.218.47:3000/api/courses/stats`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const resCourses = await fetch(`http://10.15.6.135:3000/api/courses`, {
+        const resCourses = await fetch(`http://10.188.218.47:3000/api/courses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const resGoal = await fetch(`http://10.15.6.135:3000/api/goals/daily`, {
+        const resGoal = await fetch(`http://10.188.218.47:3000/api/goals/daily`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

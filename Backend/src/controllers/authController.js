@@ -163,7 +163,7 @@ exports.getStats = (req, res) => {
 
 
 exports.getAllUsers = (req, res) => {
-  db.query("SELECT id, email, role FROM users", (err, rows) => {
+  db.query("SELECT id, email, role, username, verified FROM users", (err, rows) => {
     if (err) return res.status(500).json({ message: "Erreur récupération utilisateurs" });
     res.json(rows);
   });
@@ -180,7 +180,7 @@ exports.deleteUser = (req, res) => {
 exports.getUserCourses = (req, res) => {
   const userId = req.params.id;
   db.query(
-    "SELECT id, distance, duration, start_time, avg_speed FROM courses WHERE user_id = ?",
+    "SELECT id, distance, duration, start_time, avg_speed, path  FROM courses WHERE user_id = ?",
     [userId],
     (err, rows) => {
       if (err) return res.status(500).json({ message: "Erreur récupération courses" });

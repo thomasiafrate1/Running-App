@@ -31,7 +31,7 @@ export default function ChangePasswordScreen() {
     const token = await getToken();
 
     try {
-      const res = await fetch("http://10.15.6.135:3000/api/auth/change-password", {
+      const res = await fetch("http://10.188.218.47:3000/api/auth/change-password", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

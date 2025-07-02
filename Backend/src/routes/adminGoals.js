@@ -27,4 +27,34 @@ router.post("/templates", authMiddleware, (req, res) => {
   );
 });
 
+router.delete("/templates/:id", (req, res) => {
+  const { id } = req.params;
+  db.query("DELETE FROM goal_templates WHERE id = ?", [id], (err) => {
+    if (err) {
+      console.error("❌ Erreur suppression :", err);
+      return res.status(500).json({ message: "Erreur serveur" });
+    }
+    res.status(200).json({ message: "🗑️ Supprimé avec succès" });
+  });
+});
+
+// ✏️ Modifier un template
+router.put("/templates/:id", (req, res) => {
+  const { id } = req.params;
+  const { type, value, unit } = req.body;
+
+  db.query(
+    "UPDATE goal_templates SET type = ?, value = ?, unit = ? WHERE id = ?",
+    [type, value, unit, id],
+    (err) => {
+      if (err) {
+        console.error("❌ Erreur modification :", err);
+        return res.status(500).json({ message: "Erreur serveur" });
+      }
+      res.status(200).json({ message: "✅ Modifié avec succès" });
+    }
+  );
+});
+
+
 module.exports = router;

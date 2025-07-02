@@ -70,4 +70,40 @@ router.post("/:id/comments", auth, (req, res) => {
   });
 });
 
+// Get all comments
+router.get("/comments", auth, (req, res) => {
+  db.query(
+    `SELECT c.*, u.username 
+     FROM comments c 
+     JOIN users u ON c.user_id = u.id 
+     ORDER BY c.created_at DESC`,
+    (err, rows) => {
+      if (err) return res.status(500).json({ err });
+      res.json(rows);
+    }
+  );
+});
+
+// Delete comment
+router.delete("/comments/:id", auth, (req, res) => {
+  db.query("DELETE FROM comments WHERE id = ?", [req.params.id], (err) => {
+    if (err) return res.status(500).json({ err });
+    res.json({ message: "Supprimé" });
+  });
+});
+
+// Update comment
+router.put("/comments/:id", auth, (req, res) => {
+  const { content } = req.body;
+  if (!content || content.trim() === "") {
+    return res.status(400).json({ message: "Contenu vide" });
+  }
+
+  db.query("UPDATE comments SET content = ? WHERE id = ?", [content, req.params.id], (err) => {
+    if (err) return res.status(500).json({ err });
+    res.json({ message: "Mis à jour" });
+  });
+});
+
+
 module.exports = router;
